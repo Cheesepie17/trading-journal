@@ -8,6 +8,10 @@
   <meta name="apple-mobile-web-app-title" content="TradingJournal">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="shortcut icon" href="favicon-32x32.png">
 
   <title>TradingJOURNAL — Minimalist White Trading Calendar</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
@@ -234,30 +238,43 @@
   <!-- Main Production App Container -->
   <main id="mainAppContent" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6">
 
-    <!-- Top Minimalist Header -->
-    <header class="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 sm:px-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-          ✦
+    <!-- Top Minimalist Header (Optimized for iPad & Mobile) -->
+    <header class="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5">
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <!-- Modern Obsidian Candlestick Brand Icon -->
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-950 p-2 text-white flex items-center justify-center shrink-0 shadow-sm border border-slate-800">
+          <svg viewBox="0 0 32 32" class="w-full h-full fill-none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Left candle -->
+            <line x1="8" y1="11" x2="8" y2="23" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="6.5" y="13" width="3" height="7" rx="1" fill="rgba(255,255,255,0.6)"/>
+            <!-- Center taller bullish candle (Emerald) -->
+            <line x1="16" y1="7" x2="16" y2="25" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="14" y="10" width="4" height="11" rx="1.2" fill="#10b981"/>
+            <!-- Right breakout candle -->
+            <line x1="24" y1="5" x2="24" y2="20" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="22.5" y="7" width="3" height="8" rx="1" fill="#34d399"/>
+            <!-- Breakout momentum dot -->
+            <circle cx="27" cy="6" r="1.5" fill="#6ee7b7"/>
+          </svg>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-bold text-lg tracking-tight text-slate-900">TradingJOURNAL</h1>
-            <span class="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 py-0.5 rounded-full">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 font-mono">Trading<span class="text-emerald-600 font-bold">JOURNAL</span></h1>
+            <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 py-0.5 rounded-full shrink-0">
               PRO TRADER
             </span>
           </div>
-          <p class="text-xs text-slate-400">Trading Performance Calendar & Holographic PnL Studio</p>
+          <p class="text-[11px] sm:text-xs text-slate-400 truncate max-w-[240px] sm:max-w-md">Trading Performance Calendar & Holographic PnL Studio</p>
         </div>
       </div>
 
-      <!-- Actions & Tab Switcher -->
-      <div class="flex items-center gap-2 w-full md:w-auto">
-        <div class="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 flex-1 md:flex-none">
-          <button onclick="switchTab('calendar')" id="tab-calendar" class="flex-1 md:flex-none text-xs font-semibold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-1.5">
+      <!-- Actions & Tab Switcher (Fits cleanly on iPad) -->
+      <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+        <div class="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 w-full sm:w-auto">
+          <button onclick="switchTab('calendar')" id="tab-calendar" class="flex-1 sm:flex-none text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
             ปฏิทิน
           </button>
-          <button onclick="switchTab('studio')" id="tab-studio" class="flex-1 md:flex-none text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
+          <button onclick="switchTab('studio')" id="tab-studio" class="flex-1 sm:flex-none text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
             การ์ด PnL
           </button>
         </div>
@@ -339,9 +356,9 @@
                 <option value="NQ">NQ</option>
               </select>
             </div>
-            <div class="hidden md:flex items-center gap-1.5 text-xs font-mono text-slate-400 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
-              <span>Timezone: UTC+00</span>
-            </div>
+            <button onclick="clearAllJournalData()" title="ล้างข้อมูลปฏิทินทั้งหมดเพื่อเริ่มต้นใหม่" class="text-xs text-slate-400 hover:text-rose-600 px-2 py-1 rounded-lg border border-slate-200/80 hover:border-rose-200 hover:bg-rose-50 transition-all cursor-pointer">
+              ล้างข้อมูล
+            </button>
           </div>
 
         </div>
@@ -450,12 +467,12 @@
       <!-- Action Prompt Banner when clicking any day -->
       <div id="selectionBanner" class="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 overflow-hidden">
         <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-sm sm:text-base">
-            ✓
+          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-sm sm:text-base">
+            📅
           </div>
           <div class="min-w-0 flex-1">
-            <div class="text-xs font-bold text-slate-900 truncate" id="bannerDayTitle">เลือกวันที่ Dec 31, 2025 (+$4,309.02 • 56 trades)</div>
-            <div class="text-[11px] sm:text-xs text-slate-400 leading-tight">คลิกดูรายละเอียดบนปฏิทิน หรือกดสร้างการ์ด PnL เพื่อแชร์ผลงาน</div>
+            <div class="text-xs font-bold text-slate-900 truncate" id="bannerDayTitle">ยังไม่ได้เลือกวันบนปฏิทิน</div>
+            <div class="text-[11px] sm:text-xs text-slate-400 leading-tight">คลิกเลือกวันบนตารางปฏิทินเพื่อดูบันทึก หรือกดปุ่ม "+ จดบันทึกไม้ใหม่" เพื่อเริ่มบันทึก</div>
           </div>
         </div>
         <div class="w-full md:w-auto shrink-0 flex items-center">
@@ -609,46 +626,40 @@
             <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-1.5">
               <label class="block text-[10px] font-semibold text-slate-600">ดึงข้อมูลอัตโนมัติจากบันทึก (Quick Auto-Fill):</label>
               <select id="quickFillSelect" onchange="applyQuickFillTrade(this.value)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-400 cursor-pointer shadow-2xs">
-                <option value="summary_31">สรุปทั้งวัน 31 ธ.ค. (XAUUSD • 56 Trades • +$4,309.02)</option>
-                <option value="trade_31_1">ไม้เดี่ยว 1: XAUUSD BUY 1.50 Lot (+$2,450.00)</option>
-                <option value="trade_31_2">ไม้เดี่ยว 2: XAUUSD BUY 1.00 Lot (+$1,280.00)</option>
-                <option value="trade_31_3">ไม้เดี่ยว 3: NQ BUY 1.00 Lot (+$420.00)</option>
-                <option value="trade_31_4">ไม้เดี่ยว 4: XAUUSD BUY 0.50 Lot (+$289.02)</option>
-                <option value="summary_30">สรุปทั้งวัน 30 ธ.ค. (XAUUSD • 42 Trades • +$3,850.20)</option>
-                <option value="summary_29">สรุปทั้งวัน 29 ธ.ค. (NQ • 28 Trades • +$2,140.50)</option>
+                <option value="">-- ยังไม่มีรายการเทรดในเดือนนี้ --</option>
               </select>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-xs text-slate-500 mb-1">ชื่อสินทรัพย์</label>
-                <input type="text" id="cardPair" oninput="updateCardLive()" value="XAUUSD (GOLD)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardPair" oninput="updateCardLive()" value="XAUUSD" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
               </div>
               <div>
                 <label class="block text-xs text-slate-500 mb-1">สถานะ / วันที่</label>
-                <input type="text" id="cardStatus" oninput="updateCardLive()" value="DEC 31 • 56 TRADES • CLOSED" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardStatus" oninput="updateCardLive()" value="CLOSED" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-xs text-slate-500 mb-1">เปอร์เซ็นต์ PnL</label>
-                <input type="text" id="cardPnlPercent" oninput="updateCardLive()" value="+2.61%" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardPnlPercent" oninput="updateCardLive()" value="+0.00%" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
               </div>
               <div>
                 <label class="block text-xs text-slate-500 mb-1">จำนวนเงิน PnL</label>
-                <input type="text" id="cardPnlAmount" oninput="updateCardLive()" value="+$4,309.02" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardPnlAmount" oninput="updateCardLive()" value="+$0.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-xs text-slate-500 mb-1">Entry Price</label>
-                <input type="text" id="cardEntry" oninput="updateCardLive()" value="2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardEntry" oninput="updateCardLive()" value="2,650.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
               </div>
               <div>
                 <label class="block text-xs text-slate-500 mb-1">Exit Price</label>
-                <input type="text" id="cardExit" oninput="updateCardLive()" value="2,750.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+                <input type="text" id="cardExit" oninput="updateCardLive()" value="2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
               </div>
             </div>
           </div>
@@ -696,18 +707,30 @@
             <div class="flex items-start justify-between relative z-10">
               <div>
                 <div class="flex items-center gap-1.5 mb-0.5">
-                  <span id="previewPair" class="text-lg font-black tracking-wider text-slate-900">XAUUSD (GOLD)</span>
+                  <span id="previewPair" class="text-lg font-black tracking-wider text-slate-900">XAUUSD</span>
                   <span class="text-[10px] bg-slate-100 text-slate-700 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-200/60">
-                    SIMULATED
+                    REAL
                   </span>
                 </div>
                 <span id="previewStatus" class="text-[10px] tracking-wider text-slate-400 uppercase font-mono block">
-                  DEC 31 • 56 TRADES • CLOSED
+                  CLOSED
                 </span>
               </div>
-              <div class="text-right">
-                <span class="text-xs font-black tracking-widest text-slate-900 font-mono">TradingJOURNAL</span>
-                <span class="block text-[9px] text-slate-400 tracking-tight">JOURNAL TRADE</span>
+              <div class="text-right flex items-center gap-1.5 justify-end">
+                <div class="w-5 h-5 rounded-md bg-slate-950 p-0.5 flex items-center justify-center shrink-0 border border-slate-800">
+                  <svg viewBox="0 0 32 32" class="w-full h-full fill-none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="8" y1="11" x2="8" y2="23" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+                    <rect x="6.5" y="13" width="3" height="7" rx="1" fill="rgba(255,255,255,0.7)"/>
+                    <line x1="16" y1="7" x2="16" y2="25" stroke="#10b981" stroke-width="2"/>
+                    <rect x="14" y="10" width="4" height="11" rx="1.2" fill="#10b981"/>
+                    <line x1="24" y1="5" x2="24" y2="20" stroke="#34d399" stroke-width="2"/>
+                    <rect x="22.5" y="7" width="3" height="8" rx="1" fill="#34d399"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[11px] font-black tracking-widest text-slate-900 font-mono block leading-tight">TradingJOURNAL</span>
+                  <span class="block text-[8px] text-slate-400 font-mono tracking-wider">OFFICIAL PNL</span>
+                </div>
               </div>
             </div>
 
@@ -715,10 +738,10 @@
             <div class="relative z-10 flex items-center justify-between my-auto py-2">
               <div>
                 <div id="previewPnlPercent" class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-emerald-600">
-                  +2.61%
+                  +0.00%
                 </div>
                 <div id="previewPnlAmount" class="text-xs sm:text-sm font-bold font-mono text-slate-600 mt-1">
-                  +$4,309.02
+                  +$0.00
                 </div>
               </div>
 
@@ -746,11 +769,11 @@
               <div class="grid grid-cols-2 gap-4 text-left">
                 <div>
                   <span class="block text-[9px] text-slate-400 uppercase tracking-wider font-mono">ENTRY PRICE</span>
-                  <span id="previewEntry" class="text-xs font-bold font-mono text-slate-900">2,680.00</span>
+                  <span id="previewEntry" class="text-xs font-bold font-mono text-slate-900">2,650.00</span>
                 </div>
                 <div>
                   <span class="block text-[9px] text-slate-400 uppercase tracking-wider font-mono">EXIT PRICE</span>
-                  <span id="previewExit" class="text-xs font-bold font-mono text-slate-900">2,750.00</span>
+                  <span id="previewExit" class="text-xs font-bold font-mono text-slate-900">2,680.00</span>
                 </div>
               </div>
 
@@ -1029,9 +1052,10 @@
     let bgBlurAmount = 18;
     let bgTintAmount = 75;
 
-    // Calendar Navigation State
-    let viewYear = 2025;
-    let viewMonth = 11; // 0-indexed: 11 = December
+    // Calendar Navigation State: Starts on CURRENT REAL MONTH
+    const now = new Date();
+    let viewYear = now.getFullYear();
+    let viewMonth = now.getMonth();
 
     const monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
@@ -1042,50 +1066,29 @@
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
 
-    // Seeded Cache for December 2025 (matching reference screenshot exactly)
-    const monthDataCache = {
-      '2025-11': {
-        days: {
-          1: { pnl: 367.63, trades: 26, winPct: 65, pair: 'XAUUSD', entry: '2,640.20', exit: '2,658.50' },
-          2: { pnl: 250.77, trades: 24, winPct: 62, pair: 'XAUUSD', entry: '2,650.00', exit: '2,662.10' },
-          3: { pnl: 143.51, trades: 16, winPct: 58, pair: 'NQ', entry: '21,320', exit: '21,450' },
-          4: { pnl: 223.36, trades: 17, winPct: 60, pair: 'XAUUSD', entry: '2,655.10', exit: '2,668.00' },
-          5: { pnl: 131.62, trades: 10, winPct: 70, pair: 'NQ', entry: '21,410', exit: '21,480' },
-          8: { pnl: 194.20, trades: 20, winPct: 60, pair: 'XAUUSD', entry: '2,660.00', exit: '2,672.00' },
-          9: { pnl: -141.22, trades: 19, winPct: 35, pair: 'NQ', entry: '21,650', exit: '21,520' },
-          10: { pnl: 416.32, trades: 22, winPct: 68, pair: 'XAUUSD', entry: '2,670.00', exit: '2,691.00' },
-          11: { pnl: 501.99, trades: 21, winPct: 71, pair: 'XAUUSD', entry: '2,682.00', exit: '2,705.50' },
-          12: { pnl: -12.30, trades: 4, winPct: 50, pair: 'NQ', entry: '21,550', exit: '21,540' },
-          15: { pnl: 112.50, trades: 12, winPct: 58, pair: 'XAUUSD', entry: '2,690.00', exit: '2,696.00' },
-          16: { pnl: 32.10, trades: 8, winPct: 55, pair: 'NQ', entry: '21,580', exit: '21,610' },
-          17: { pnl: -210.58, trades: 14, winPct: 28, pair: 'XAUUSD', entry: '2,710.00', exit: '2,695.00' },
-          18: { pnl: 89.44, trades: 9, winPct: 56, pair: 'NQ', entry: '21,620', exit: '21,690' },
-          19: { pnl: 54.20, trades: 6, winPct: 66, pair: 'XAUUSD', entry: '2,705.00', exit: '2,711.00' },
-          22: { pnl: 85.10, trades: 7, winPct: 71, pair: 'XAUUSD', entry: '2,715.00', exit: '2,722.00' },
-          23: { pnl: 120.40, trades: 11, winPct: 63, pair: 'NQ', entry: '21,700', exit: '21,780' },
-          24: { pnl: 45.00, trades: 5, winPct: 60, pair: 'XAUUSD', entry: '2,720.00', exit: '2,725.00' },
-          26: { pnl: 29.35, trades: 4, winPct: 75, pair: 'NQ', entry: '21,750', exit: '21,770' },
-          29: { pnl: 3.20, trades: 3, winPct: 66, pair: 'XAUUSD', entry: '2,722.00', exit: '2,723.50' },
-          30: { pnl: -2.30, trades: 4, winPct: 50, pair: 'NQ', entry: '21,800', exit: '21,795' },
-          31: { pnl: 4309.02, trades: 56, winPct: 82, pair: 'XAUUSD', entry: '2,680.00', exit: '2,750.00' }
-        },
-        metrics: {
-          netProfit: 6743.31,
-          pct: '+24.8%',
-          winRate: '61.2',
-          trades: 358,
-          winningTrades: 219,
-          profitFactor: '4.02',
-          avgWin: '40.97',
-          avgLoss: '28.14',
-          volatility: '915.66',
-          bestDayVal: '+$4,309.02',
-          bestDaySub: 'Dec 31 (56 tr)'
-        }
-      }
-    };
+    // Clean data cache - starts empty for real user trading records
+    const monthDataCache = {};
 
-    // Realistic procedural data generator for any month/year
+    function createEmptyMonthData() {
+      return {
+        days: {},
+        metrics: {
+          netProfit: 0,
+          pct: '0.0%',
+          winRate: '0.0',
+          trades: 0,
+          winningTrades: 0,
+          profitFactor: '0.00',
+          avgWin: '0.00',
+          avgLoss: '0.00',
+          volatility: '0.00',
+          bestDayVal: '$0.00',
+          bestDaySub: 'ยังไม่มีข้อมูล'
+        }
+      };
+    }
+
+    // Fetch user recorded data from localStorage or return clean empty month
     function getMonthData(year, month) {
       const key = `${year}-${month}`;
       try {
@@ -1098,94 +1101,19 @@
 
       if (monthDataCache[key]) return monthDataCache[key];
 
-      let seed = year * 1000 + month * 73 + 109;
-      function rand() {
-        seed = (seed * 9301 + 49297) % 233280;
-        return seed / 233280;
+      const empty = createEmptyMonthData();
+      monthDataCache[key] = empty;
+      return empty;
+    }
+
+    // Clear all saved data to start 100% clean
+    function clearAllJournalData() {
+      if (confirm('คุณต้องการล้างข้อมูลบันทึกทั้งหมดเพื่อเริ่มต้นใหม่ใช่หรือไม่?')) {
+        localStorage.removeItem('tradingjournal_custom_data');
+        for (const k in monthDataCache) delete monthDataCache[k];
+        renderCalendar();
+        showToast('ล้างข้อมูลปฏิทินเรียบร้อยแล้ว (ตารางว่างพร้อมบันทึก)');
       }
-
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const days = {};
-      let totalPnL = 0;
-      let totalTrades = 0;
-      let winTrades = 0;
-      let lossTrades = 0;
-      let winSum = 0;
-      let lossSum = 0;
-      let bestDay = { day: 1, pnl: -Infinity, trades: 0 };
-
-      const pairs = ['XAUUSD', 'NQ'];
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dayOfWeek = new Date(year, month, d).getDay();
-        // Weekdays (Mon-Fri) trade regularly; weekends rarely
-        const isTradingDay = (dayOfWeek >= 1 && dayOfWeek <= 5) || (rand() > 0.82);
-        if (!isTradingDay) continue;
-
-        const trades = Math.floor(rand() * 20) + 5;
-        const isWin = rand() > 0.35;
-        let pnl;
-        if (isWin) {
-          pnl = Math.round((rand() * 520 + 40) * 100) / 100;
-          winSum += pnl;
-          const dayWins = Math.round(trades * (rand() * 0.3 + 0.55));
-          winTrades += dayWins;
-          lossTrades += (trades - dayWins);
-        } else {
-          pnl = -Math.round((rand() * 260 + 25) * 100) / 100;
-          lossSum += Math.abs(pnl);
-          const dayWins = Math.round(trades * (rand() * 0.25 + 0.2));
-          winTrades += dayWins;
-          lossTrades += (trades - dayWins);
-        }
-
-        const pair = pairs[Math.floor(rand() * pairs.length)];
-        let entry = pair === 'NQ' ? (21000 + Math.floor(rand() * 900)).toLocaleString() :
-                    (2600 + Math.floor(rand() * 180)).toFixed(2);
-        let exit = pair === 'NQ' ? (21000 + Math.floor(rand() * 900)).toLocaleString() :
-                   (2600 + Math.floor(rand() * 180)).toFixed(2);
-
-        days[d] = {
-          pnl: pnl,
-          trades: trades,
-          winPct: isWin ? Math.round(rand() * 20 + 60) : Math.round(rand() * 20 + 25),
-          pair: pair,
-          entry: entry,
-          exit: exit
-        };
-
-        totalPnL += pnl;
-        totalTrades += trades;
-
-        if (pnl > bestDay.pnl) {
-          bestDay = { day: d, pnl: pnl, trades: trades };
-        }
-      }
-
-      const winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0';
-      const pf = lossSum > 0 ? (winSum / lossSum).toFixed(2) : '3.85';
-      const avgWin = winTrades > 0 ? (winSum / winTrades).toFixed(2) : '42.10';
-      const avgLoss = lossTrades > 0 ? (lossSum / lossTrades).toFixed(2) : '27.40';
-
-      const generated = {
-        days: days,
-        metrics: {
-          netProfit: Math.round(totalPnL * 100) / 100,
-          pct: (totalPnL >= 0 ? '+' : '') + (totalPnL / 280).toFixed(1) + '%',
-          winRate: winRate,
-          trades: totalTrades,
-          winningTrades: winTrades,
-          profitFactor: pf,
-          avgWin: avgWin,
-          avgLoss: avgLoss,
-          volatility: (Math.abs(totalPnL) / 8 + 320).toFixed(2),
-          bestDayVal: (bestDay.pnl >= 0 ? '+$' : '-$') + Math.abs(bestDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 }),
-          bestDaySub: `${monthNamesShort[month]} ${bestDay.day} (${bestDay.trades} tr)`
-        }
-      };
-
-      monthDataCache[key] = generated;
-      return generated;
     }
 
     // Month Navigation Handlers
@@ -1918,9 +1846,27 @@
       let lossTrades = 0;
       let winSum = 0;
       let lossSum = 0;
-      let bestDay = { day: 1, pnl: -Infinity, trades: 0 };
+      let bestDay = null;
 
-      for (const [dayKey, dayItem] of Object.entries(monthData.days)) {
+      const dayEntries = Object.entries(monthData.days || {});
+      if (dayEntries.length === 0) {
+        monthData.metrics = {
+          netProfit: 0,
+          pct: '0.0%',
+          winRate: '0.0',
+          trades: 0,
+          winningTrades: 0,
+          profitFactor: '0.00',
+          avgWin: '0.00',
+          avgLoss: '0.00',
+          volatility: '0.00',
+          bestDayVal: '$0.00',
+          bestDaySub: 'ยังไม่มีข้อมูล'
+        };
+        return;
+      }
+
+      for (const [dayKey, dayItem] of dayEntries) {
         totalPnL += dayItem.pnl;
         totalTrades += dayItem.trades;
         if (dayItem.pnl >= 0) {
@@ -1930,18 +1876,29 @@
           lossSum += Math.abs(dayItem.pnl);
           lossTrades += Math.ceil(dayItem.trades * 0.4);
         }
-        if (dayItem.pnl > bestDay.pnl) {
+        if (!bestDay || dayItem.pnl > bestDay.pnl) {
           bestDay = { day: Number(dayKey), pnl: dayItem.pnl, trades: dayItem.trades };
         }
       }
 
-      monthData.metrics.netProfit = Math.round(totalPnL * 100) / 100;
-      monthData.metrics.trades = totalTrades;
-      monthData.metrics.winningTrades = winTrades;
-      monthData.metrics.winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0';
-      monthData.metrics.profitFactor = lossSum > 0 ? (winSum / lossSum).toFixed(2) : '4.00';
-      monthData.metrics.bestDayVal = (bestDay.pnl >= 0 ? '+$' : '-$') + Math.abs(bestDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      monthData.metrics.bestDaySub = `${monthNamesShort[m]} ${bestDay.day} (${bestDay.trades} tr)`;
+      const winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0';
+      const pf = lossSum > 0 ? (winSum / lossSum).toFixed(2) : (winSum > 0 ? '9.99' : '0.00');
+      const avgWin = winTrades > 0 ? (winSum / winTrades).toFixed(2) : '0.00';
+      const avgLoss = lossTrades > 0 ? (lossSum / lossTrades).toFixed(2) : '0.00';
+
+      monthData.metrics = {
+        netProfit: Math.round(totalPnL * 100) / 100,
+        pct: (totalPnL >= 0 ? '+' : '') + (totalPnL / 280).toFixed(1) + '%',
+        winRate: winRate,
+        trades: totalTrades,
+        winningTrades: winTrades,
+        profitFactor: pf,
+        avgWin: avgWin,
+        avgLoss: avgLoss,
+        volatility: totalTrades > 0 ? (Math.abs(totalPnL) / 8 + 120).toFixed(2) : '0.00',
+        bestDayVal: bestDay ? ((bestDay.pnl >= 0 ? '+$' : '-$') + Math.abs(bestDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })) : '$0.00',
+        bestDaySub: bestDay ? `${monthNamesShort[m]} ${bestDay.day} (${bestDay.trades} tr)` : 'ยังไม่มีข้อมูล'
+      };
     }
 
     function saveMonthDataToStorage(y, m, monthData) {
@@ -2893,7 +2850,8 @@
 
     // Initialize calendar on page load
     renderCalendar();
-    populateQuickFillDropdown(2025, 11, 31);
+    populateQuickFillDropdown(viewYear, viewMonth, new Date().getDate());
+    updateCardLive();
   </script>
 </body>
 </html>
