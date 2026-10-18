@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="th" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TradingJournal">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="manifest.json">
+
+  <title>TradingJOURNAL — Minimalist White Trading Calendar</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Subtle dot pattern for clean luxury look */
+    .bg-dot-pattern {
+      background-color: #fafbfc;
+      background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    /* Pearlescent White Holographic Card */
+    .holo-pearl-card {
+      background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #fbfcfd 25%,
+        #f0fdf4 50%,
+        #eff6ff 75%,
+        #ffffff 100%
+      );
+      position: relative;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07),
+                  0 0 0 1px rgba(226, 232, 240, 0.8),
+                  inset 0 1px 2px rgba(255, 255, 255, 1);
+    }
+    .holo-pearl-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(254, 240, 138, 0.25) 30%,
+        rgba(244, 114, 182, 0.2) 50%,
+        rgba(103, 232, 249, 0.25) 70%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+    /* Day Tile States */
+    .day-win {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .day-win:hover {
+      background: #dcfce7;
+      border-color: #86efac;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -4px rgba(34, 197, 94, 0.2);
+    }
+    .day-loss {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      color: #9f1239;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .day-loss:hover {
+      background: #ffe4e6;
+      border-color: #fda4af;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -4px rgba(244, 63, 94, 0.2);
+    }
+    .day-empty {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      color: #94a3b8;
+    }
+    .week-summary-win {
+      background: #f8fafc;
+      border: 1.5px dashed #86efac;
+      color: #15803d;
+    }
+    .week-summary-loss {
+      background: #f8fafc;
+      border: 1.5px dashed #fca5a5;
+      color: #b91c1c;
+    }
+
+    /* ============================================================
+       Device View Simulator (iPhone 390px / iPad 768px)
+       Overrides desktop viewport media queries inside the mockup frame
+    ============================================================ */
+    .device-iphone {
+      max-width: 393px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      overflow: hidden !important;
+    }
+    .device-iphone #mainAppContent {
+      padding: 0.75rem !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+    }
+    /* Header on iPhone */
+    .device-iphone header {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      padding: 1rem !important;
+      gap: 0.75rem !important;
+    }
+    .device-iphone header > div {
+      width: 100% !important;
+    }
+    /* Top Metrics: strictly 2 columns on iPhone */
+    .device-iphone #topMetricsGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.5rem !important;
+    }
+    .device-iphone #topMetricsGrid > div {
+      padding: 0.75rem !important;
+    }
+    .device-iphone #topMetricsGrid .text-2xl {
+      font-size: 1.25rem !important;
+    }
+    /* Calendar Toolbar: cleanly stacked */
+    .device-iphone #calendarToolbar {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      padding: 0.75rem !important;
+      gap: 0.75rem !important;
+    }
+    .device-iphone #calendarToolbar > div {
+      width: 100% !important;
+      justify-content: space-between !important;
+      flex-wrap: wrap !important;
+    }
+    /* Mobile swipe hint */
+    .device-iphone #mobileSwipeHint {
+      display: flex !important;
+    }
+    /* Bottom 6 Metrics: 2 columns on iPhone instead of 6 squeezed columns */
+    .device-iphone #bottomMetricsGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.5rem !important;
+    }
+    /* Selection Banner: strictly stacked, full width button, no overflow */
+    .device-iphone #selectionBanner {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      padding: 0.875rem !important;
+      gap: 0.75rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .device-iphone #selectionBanner > div {
+      width: 100% !important;
+    }
+    .device-iphone #selectionBanner button {
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+    /* Studio Layout: single column stacked */
+    .device-iphone #studioLayoutGrid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.25rem !important;
+    }
+    .device-iphone #studioControlsCol {
+      order: 2 !important;
+      width: 100% !important;
+    }
+    .device-iphone #studioPreviewCol {
+      order: 1 !important;
+      width: 100% !important;
+      padding: 1rem !important;
+      min-height: auto !important;
+    }
+    .device-iphone #pnlCard {
+      padding: 1rem !important;
+    }
+    .device-iphone #pnlCard #previewPnlPercent {
+      font-size: 2.25rem !important;
+    }
+
+    /* iPad Simulator Overrides */
+    .device-ipad {
+      max-width: 768px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      overflow: hidden !important;
+    }
+    .device-ipad #topMetricsGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+    }
+    .device-ipad #bottomMetricsGrid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+    }
+    .device-ipad #studioLayoutGrid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.5rem !important;
+    }
+    .device-ipad #studioControlsCol {
+      order: 2 !important;
+      width: 100% !important;
+    }
+    .device-ipad #studioPreviewCol {
+      order: 1 !important;
+      width: 100% !important;
+    }
+  </style>
+</head>
+<body class="bg-dot-pattern text-slate-800 min-h-screen antialiased p-2 sm:p-6 lg:p-8">
+
+  
+
+  <!-- Main Production App Container -->
+  <main id="mainAppContent" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6">
+
+    <!-- Top Minimalist Header -->
+    <header class="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 sm:px-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          ✦
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-lg tracking-tight text-slate-900">TradingJOURNAL</h1>
+            <span class="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 py-0.5 rounded-full">
+              PRO TRADER
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Trading Performance Calendar & Holographic PnL Studio</p>
+        </div>
+      </div>
+
+      <!-- Actions & Tab Switcher -->
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <div class="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 flex-1 md:flex-none">
+          <button onclick="switchTab('calendar')" id="tab-calendar" class="flex-1 md:flex-none text-xs font-semibold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-1.5">
+            ปฏิทิน
+          </button>
+          <button onclick="switchTab('studio')" id="tab-studio" class="flex-1 md:flex-none text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
+            การ์ด PnL
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: CLEAN WHITE CALENDAR HEATMAP -->
+    <div id="view-calendar" class="space-y-5">
+
+      <!-- Top Summary Metrics Banner (Clean Minimalist Cards) -->
+      <div id="topMetricsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white border border-slate-200/70 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <span class="text-[11px] font-medium text-slate-400 block mb-1 uppercase" id="topNetProfitLabel">TOTAL NET PROFIT (DECEMBER 2025)</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-mono text-emerald-600" id="topNetProfitVal">+$6,743.31</span>
+            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60" id="topNetProfitPct">+24.8%</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/70 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <span class="text-[11px] font-medium text-slate-400 block mb-1 uppercase">WIN RATE</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-mono text-slate-900" id="topWinRateVal">61.2%</span>
+            <span class="text-xs text-slate-400 font-normal" id="topWinRateSub">219 / 358 Trades</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/70 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <span class="text-[11px] font-medium text-slate-400 block mb-1 uppercase">PROFIT FACTOR</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-mono text-slate-900" id="topProfitFactorVal">4.02</span>
+            <span class="text-xs text-slate-400 font-normal" id="topProfitFactorSub">Avg Win $40.97</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/70 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <span class="text-[11px] font-medium text-slate-400 block mb-1 uppercase">BEST DAY</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-mono text-emerald-600" id="topBestDayVal">+$4,309.02</span>
+            <span class="text-xs text-slate-400 font-normal" id="topBestDaySub">Dec 31 (56 tr)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CALENDAR CONTAINER (PREMIUM WHITE CARD) -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
+        
+        <!-- Calendar Toolbar -->
+        <div id="calendarToolbar" class="p-4 sm:px-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          
+          <!-- Month Selector -->
+          <div class="flex items-center gap-2">
+            <button onclick="changeMonth(-1)" title="เดือนก่อนหน้า" class="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-700 text-sm font-bold transition-all cursor-pointer active:scale-90">
+              ‹
+            </button>
+            <div class="text-sm font-bold text-slate-900 px-2 flex items-center gap-2 min-w-[150px] justify-center">
+              <span id="currentMonthYearLabel">December 2025</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            </div>
+            <button onclick="changeMonth(1)" title="เดือนถัดไป" class="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-700 text-sm font-bold transition-all cursor-pointer active:scale-90">
+              ›
+            </button>
+            <button onclick="goToCurrentMonth()" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer">
+              Today
+            </button>
+          </div>
+
+          <!-- Filters & Add Trade Action -->
+          <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <button onclick="openAddTradeModal()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <span class="text-white text-sm leading-none">+</span>
+              <span>จดบันทึกไม้ใหม่</span>
+            </button>
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-1 text-xs">
+              <span class="text-slate-400">Symbol:</span>
+              <select id="symbolFilter" onchange="renderCalendar()" class="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+                <option value="ALL">All Symbols</option>
+                <option value="XAUUSD">XAUUSD</option>
+                <option value="NQ">NQ</option>
+              </select>
+            </div>
+            <div class="hidden md:flex items-center gap-1.5 text-xs font-mono text-slate-400 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
+              <span>Timezone: UTC+00</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Mobile swipe indicator for iPhone -->
+        <div id="mobileSwipeHint" class="sm:hidden px-4 py-1.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-[10px] text-slate-400 select-none">
+          <span>ปฏิทิน 7 วัน + สรุปรายสัปดาห์</span>
+          <span class="font-mono text-slate-400">เลื่อนซ้าย-ขวา ↔</span>
+        </div>
+
+        <!-- Responsive Scroll Wrapper to fit cleanly on iPad and scroll smoothly on iPhone -->
+        <div class="overflow-x-auto">
+          <div class="min-w-[680px] md:min-w-full">
+            <!-- Days of Week Header (8 Columns: Su - Sa + Σ Week) -->
+            <div class="grid grid-cols-8 border-b border-slate-100 bg-slate-50/70 text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider py-2.5">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+              <div class="text-slate-700 font-extrabold bg-slate-100/70">Σ Week</div>
+            </div>
+
+            <!-- DYNAMIC CALENDAR TILES GRID RENDERED VIA JAVASCRIPT -->
+            <div id="calendarGridRows" class="p-3 sm:p-4 space-y-2">
+              <!-- Dynamically populated rows -->
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Modern Segmented Footer Analytics -->
+        <div class="p-4 sm:p-5 bg-slate-50/90 border-t border-slate-100">
+          <div id="bottomMetricsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+            
+            <!-- Metric 1: Win Rate -->
+            <div class="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs hover:border-slate-300 transition-colors">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Win Rate</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              </div>
+              <div class="font-extrabold font-mono text-sm sm:text-base text-slate-900" id="bottomWinRateVal">
+                61.2%
+              </div>
+              <span class="text-[10px] text-slate-400 font-medium" id="bottomWinRateSub">219 of 358 trades</span>
+            </div>
+
+            <!-- Metric 2: Profit Factor -->
+            <div class="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs hover:border-slate-300 transition-colors">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Profit Factor</span>
+                <span class="text-[10px] text-emerald-600 font-bold">↑</span>
+              </div>
+              <div class="font-extrabold font-mono text-sm sm:text-base text-emerald-600" id="bottomProfitFactorVal">
+                4.02
+              </div>
+              <span class="text-[10px] text-slate-400 font-medium">Excellent edge</span>
+            </div>
+
+            <!-- Metric 3: Avg Win -->
+            <div class="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs hover:border-slate-300 transition-colors">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Avg Win</span>
+              <div class="font-extrabold font-mono text-sm sm:text-base text-emerald-600" id="bottomAvgWinVal">
+                +$40.97
+              </div>
+              <span class="text-[10px] text-emerald-700/80 font-medium bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">Profitable</span>
+            </div>
+
+            <!-- Metric 4: Avg Loss -->
+            <div class="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs hover:border-slate-300 transition-colors">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Avg Loss</span>
+              <div class="font-extrabold font-mono text-sm sm:text-base text-rose-600" id="bottomAvgLossVal">
+                -$28.14
+              </div>
+              <span class="text-[10px] text-rose-700/80 font-medium bg-rose-50 px-1.5 py-0.2 rounded border border-rose-100">Contained RR</span>
+            </div>
+
+            <!-- Metric 5: Volatility -->
+            <div class="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs hover:border-slate-300 transition-colors">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Daily Volatility</span>
+              <div class="font-extrabold font-mono text-sm sm:text-base text-slate-800" id="bottomVolatilityVal">
+                $915.66
+              </div>
+              <span class="text-[10px] text-slate-400 font-medium">Sharpe ~0.33</span>
+            </div>
+
+            <!-- Metric 6: Best Day -->
+            <div class="bg-white border border-emerald-200 rounded-xl p-2.5 shadow-2xs bg-gradient-to-br from-white to-emerald-50/40 hover:border-emerald-300 transition-colors">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Best Day</span>
+                <span class="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-mono">TOP</span>
+              </div>
+              <div class="font-extrabold font-mono text-xs sm:text-[13px] text-emerald-700 truncate" id="bottomBestDayVal">
+                +$4,309.02
+              </div>
+              <span class="text-[10px] text-slate-500 font-medium" id="bottomBestDaySub">Dec 31 (56 tr)</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Prompt Banner when clicking any day -->
+      <div id="selectionBanner" class="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 overflow-hidden">
+        <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-sm sm:text-base">
+            ✓
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold text-slate-900 truncate" id="bannerDayTitle">เลือกวันที่ Dec 31, 2025 (+$4,309.02 • 56 trades)</div>
+            <div class="text-[11px] sm:text-xs text-slate-400 leading-tight">คลิกดูรายละเอียดบนปฏิทิน หรือกดสร้างการ์ด PnL เพื่อแชร์ผลงาน</div>
+          </div>
+        </div>
+        <div class="w-full md:w-auto shrink-0 flex items-center">
+          <button onclick="switchTab('studio')" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+            <span>สร้างการ์ด PnL</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: PNL CARD STUDIO (PEARL WHITE HOLO + CUSTOM IMAGE) -->
+    <div id="view-studio" class="hidden space-y-6">
+
+      <div id="studioLayoutGrid" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Controls Column (Left on desktop, bottom on mobile) -->
+        <div id="studioControlsCol" class="order-2 lg:order-1 lg:col-span-5 space-y-4 bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+          <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div>
+              <h2 class="font-bold text-sm text-slate-900">
+                ปรับแต่งการ์ด PnL (Card Studio)
+              </h2>
+              <p class="text-xs text-slate-400">อัปโหลดรูปอะไรก็ได้มาใส่บนการ์ด หรือเปลี่ยนสไตล์การ์ด</p>
+            </div>
+          </div>
+
+          <!-- Upload Any Image Feature -->
+          <!-- Media Upload: Image or Video -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800">
+                เลือกรูปภาพหรือวิดีโอ (Image / Video)
+              </label>
+              <span class="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                MP4 • MOV • รูปภาพ
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">เลือกรูปภาพ (JPG, PNG, GIF) หรือวิดีโอสั้น (MP4, WebM) มาเล่นวนในการ์ดได้ตามใจชอบ</p>
+
+            <div class="flex items-center gap-2">
+              <label class="flex-1 cursor-pointer bg-white hover:bg-slate-50 border border-dashed border-slate-300 hover:border-slate-400 text-slate-700 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-2xs font-semibold">
+                <span id="uploadLabel">เลือกรูปภาพหรือวิดีโอจากเครื่อง</span>
+                <input type="file" id="mediaInput" accept="image/*,video/*" onchange="handleMediaUpload(event)" class="hidden">
+              </label>
+              <button onclick="clearCustomMedia()" id="btnClearMedia" class="hidden text-xs bg-rose-50 text-rose-600 border border-rose-200 px-3 py-2 rounded-lg hover:bg-rose-100 font-semibold cursor-pointer">
+                ลบออก
+              </button>
+            </div>
+
+            <!-- Media Size & Fit controls -->
+            <div id="mediaControls" class="hidden grid grid-cols-2 gap-2 pt-1 border-t border-slate-200">
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">ขนาดสื่อ (Size)</label>
+                <input type="range" id="mediaScale" min="80" max="220" value="128" oninput="updateMediaSize()" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">ความโปร่งใส (Opacity)</label>
+                <input type="range" id="mediaOpacity" min="30" max="100" value="100" oninput="updateMediaOpacity()" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900">
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Background & Blur Studio -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800">
+                พื้นหลังการ์ด (Card Background)
+              </label>
+              <span class="text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full font-semibold">
+                ปรับเบลอได้
+              </span>
+            </div>
+
+            <!-- Background Preset Buttons -->
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" onclick="setBgTheme('media')" id="btnBg-media" class="border-2 border-slate-900 bg-white p-2 rounded-xl text-center text-xs font-semibold text-slate-900 shadow-2xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer py-2.5">
+                <span class="text-[11px] leading-tight font-bold">ใช้รูป/วิดีโอ<br><span class="text-[9px] font-normal text-slate-500">Media Blur</span></span>
+              </button>
+              <button type="button" onclick="setBgTheme('holo')" id="btnBg-holo" class="border border-slate-200 hover:border-slate-400 bg-white p-2 rounded-xl text-center text-xs font-semibold text-slate-600 shadow-2xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer py-2.5">
+                <span class="text-[11px] leading-tight font-medium">โฮโลแกรม<br><span class="text-[9px] font-normal text-slate-400">Pearl Holo</span></span>
+              </button>
+              <button type="button" onclick="setBgTheme('custom')" id="btnBg-custom" class="border border-slate-200 hover:border-slate-400 bg-white p-2 rounded-xl text-center text-xs font-semibold text-slate-600 shadow-2xs transition-all flex flex-col items-center justify-center gap-1 cursor-pointer py-2.5">
+                <span class="text-[11px] leading-tight font-medium">อัปโหลดแยก<br><span class="text-[9px] font-normal text-slate-400">Custom BG</span></span>
+              </button>
+            </div>
+
+            <!-- Custom Background Media Upload Input (if user wants separate BG) -->
+            <div id="customBgUploadRow" class="hidden">
+              <label class="cursor-pointer bg-white hover:bg-slate-50 border border-dashed border-slate-300 text-slate-700 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-2xs font-semibold">
+                <span id="bgUploadLabel">เลือกรูปภาพ/วิดีโอพื้นหลังแยก</span>
+                <input type="file" id="bgMediaInput" accept="image/*,video/*" onchange="handleSeparateBgUpload(event)" class="hidden">
+              </label>
+            </div>
+
+            <!-- Blur & Frosted Glass Controls -->
+            <div class="space-y-2.5 pt-1 border-t border-slate-200/80">
+              <div>
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                  <span class="font-semibold text-slate-700">ความเบลอพื้นหลัง (Background Blur)</span>
+                  <span id="blurValLabel" class="font-mono text-slate-700 font-bold">18px</span>
+                </div>
+                <input type="range" id="bgBlurRange" min="0" max="45" value="18" oninput="updateBgBlur()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900">
+                <div class="flex justify-between text-[9px] text-slate-400 mt-0.5 font-mono">
+                  <span>0px (คมชัด)</span>
+                  <span>18px (แนะนำ)</span>
+                  <span>45px (เบลอเนียน)</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                  <span class="font-semibold text-slate-700">ฟิลเตอร์ฝ้าบังแสง (Glass Tint Overlay)</span>
+                  <span id="tintValLabel" class="font-mono text-slate-700 font-bold">75%</span>
+                </div>
+                <input type="range" id="bgTintRange" min="15" max="95" value="75" oninput="updateBgTint()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900">
+                <div class="flex justify-between text-[9px] text-slate-400 mt-0.5 font-mono">
+                  <span>15% (เห็นพื้นหลังชัด)</span>
+                  <span>75% (อ่านตัวหนังสือชัดเจน)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orientation -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">ขนาดการ์ด (Orientation)</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setOrientation('landscape')" id="btn-ori-land" class="border border-slate-900 bg-slate-900 text-white text-xs py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-2xs">
+                แนวนอน (Landscape)
+              </button>
+              <button onclick="setOrientation('portrait')" id="btn-ori-port" class="border border-slate-200 bg-white text-slate-700 text-xs py-2 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-2xs">
+                แนวตั้ง (Story / Reel)
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Card Text Fields -->
+          <div class="space-y-3 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-xs font-bold text-slate-800">ข้อมูลบนการ์ด (Card Details)</label>
+                <p class="text-[10px] text-slate-400">ดึงข้อมูลอัตโนมัติจากบันทึก หรือแก้ไขเองได้ตามใจชอบ</p>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                Auto-fill & Editable
+              </span>
+            </div>
+
+            <!-- Quick Auto-Fill Selector from Journal -->
+            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-1.5">
+              <label class="block text-[10px] font-semibold text-slate-600">ดึงข้อมูลอัตโนมัติจากบันทึก (Quick Auto-Fill):</label>
+              <select id="quickFillSelect" onchange="applyQuickFillTrade(this.value)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-400 cursor-pointer shadow-2xs">
+                <option value="summary_31">สรุปทั้งวัน 31 ธ.ค. (XAUUSD • 56 Trades • +$4,309.02)</option>
+                <option value="trade_31_1">ไม้เดี่ยว 1: XAUUSD BUY 1.50 Lot (+$2,450.00)</option>
+                <option value="trade_31_2">ไม้เดี่ยว 2: XAUUSD BUY 1.00 Lot (+$1,280.00)</option>
+                <option value="trade_31_3">ไม้เดี่ยว 3: NQ BUY 1.00 Lot (+$420.00)</option>
+                <option value="trade_31_4">ไม้เดี่ยว 4: XAUUSD BUY 0.50 Lot (+$289.02)</option>
+                <option value="summary_30">สรุปทั้งวัน 30 ธ.ค. (XAUUSD • 42 Trades • +$3,850.20)</option>
+                <option value="summary_29">สรุปทั้งวัน 29 ธ.ค. (NQ • 28 Trades • +$2,140.50)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">ชื่อสินทรัพย์</label>
+                <input type="text" id="cardPair" oninput="updateCardLive()" value="XAUUSD (GOLD)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">สถานะ / วันที่</label>
+                <input type="text" id="cardStatus" oninput="updateCardLive()" value="DEC 31 • 56 TRADES • CLOSED" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">เปอร์เซ็นต์ PnL</label>
+                <input type="text" id="cardPnlPercent" oninput="updateCardLive()" value="+2.61%" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">จำนวนเงิน PnL</label>
+                <input type="text" id="cardPnlAmount" oninput="updateCardLive()" value="+$4,309.02" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-emerald-600 font-bold focus:outline-none focus:border-slate-400">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Entry Price</label>
+                <input type="text" id="cardEntry" oninput="updateCardLive()" value="2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Exit Price</label>
+                <input type="text" id="cardExit" oninput="updateCardLive()" value="2,750.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Buttons: Video & Image -->
+          <div class="pt-2 space-y-2">
+            <!-- Record Video Button -->
+            <button type="button" onclick="recordCardVideo()" id="btnRecordVideo" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+              <span id="recordVideoIndicator" class="hidden w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+              <span id="recordVideoText">บันทึกเป็นคลิปวิดีโอ (Record Video MP4)</span>
+            </button>
+
+            <!-- Save Image Button -->
+            <button type="button" onclick="downloadCardImage()" id="btnSaveImage" class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-semibold py-2.5 px-4 rounded-xl text-xs shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+              <span>บันทึกเป็นรูปภาพนิ่ง (Save Still Image PNG)</span>
+            </button>
+
+            <!-- Help & Recording Progress text -->
+            <p class="text-[11px] text-slate-400 text-center leading-relaxed" id="exportHelpText">
+              สำหรับวิดีโอ: กดปุ่มสีเขียวเพื่อบันทึกคลิปการ์ดเคลื่อนไหว 4 วินาที นำไปลง TikTok / IG Reels / Story ได้ทันที
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Card Preview Stage (Right on desktop, top priority on mobile) -->
+        <div id="studioPreviewCol" class="order-1 lg:order-2 lg:col-span-7 flex flex-col items-center justify-center bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-8 min-h-[340px] sm:min-h-[480px] shadow-sm relative overflow-hidden">
+          
+          <div class="mb-4 text-center">
+            <span class="text-xs font-medium text-slate-400">Live Preview การ์ด PnL สีขาวมุกโฮโลแกรม (Pearlescent White)</span>
+          </div>
+
+          <!-- THE PNL CARD ELEMENT (WHITE PEARLESCENT HOLO) -->
+          <div id="pnlCard" class="holo-pearl-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 w-full max-w-[460px] aspect-[16/10] flex flex-col justify-between shadow-lg">
+            
+            <!-- Dynamic Blurred Background Layer (Image or Video) -->
+            <div id="cardBgContainer" class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+              <img id="cardBgImg" class="hidden absolute inset-0 w-full h-full object-cover scale-110 transition-transform origin-center" alt="Card Background" style="filter: blur(18px);">
+              <video id="cardBgVideo" class="hidden absolute inset-0 w-full h-full object-cover scale-110 transition-transform origin-center" autoplay loop muted playsinline style="filter: blur(18px);"></video>
+              <div id="cardBgTint" class="absolute inset-0 bg-white/75 transition-colors"></div>
+              <div id="cardHoloOverlay" class="absolute inset-0 bg-gradient-to-tr from-transparent via-pink-200/20 to-teal-200/20 pointer-events-none"></div>
+            </div>
+
+            <!-- Top Header on Card -->
+            <div class="flex items-start justify-between relative z-10">
+              <div>
+                <div class="flex items-center gap-1.5 mb-0.5">
+                  <span id="previewPair" class="text-lg font-black tracking-wider text-slate-900">XAUUSD (GOLD)</span>
+                  <span class="text-[10px] bg-slate-100 text-slate-700 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-200/60">
+                    SIMULATED
+                  </span>
+                </div>
+                <span id="previewStatus" class="text-[10px] tracking-wider text-slate-400 uppercase font-mono block">
+                  DEC 31 • 56 TRADES • CLOSED
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-black tracking-widest text-slate-900 font-mono">TradingJOURNAL</span>
+                <span class="block text-[9px] text-slate-400 tracking-tight">JOURNAL TRADE</span>
+              </div>
+            </div>
+
+            <!-- Center Content (PnL Number + Mascot/Uploaded Image) -->
+            <div class="relative z-10 flex items-center justify-between my-auto py-2">
+              <div>
+                <div id="previewPnlPercent" class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-emerald-600">
+                  +2.61%
+                </div>
+                <div id="previewPnlAmount" class="text-xs sm:text-sm font-bold font-mono text-slate-600 mt-1">
+                  +$4,309.02
+                </div>
+              </div>
+
+              <!-- Media Visual Container (Image or Video) -->
+              <div id="previewImageWrapper" class="relative cursor-pointer" onclick="document.getElementById('mediaInput').click()" title="คลิกเพื่อเลือกรูปภาพหรือวิดีโอ">
+                <div id="previewImageContainer" class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-slate-100/90 border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden relative group">
+                  <!-- Empty placeholder when no media uploaded -->
+                  <div id="mediaPlaceholder" class="flex flex-col items-center justify-center text-slate-400 p-2 text-center select-none group-hover:text-slate-600 transition-colors">
+                    <svg class="w-7 h-7 mb-1 stroke-current stroke-[1.5] fill-none" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span class="text-[10px] font-semibold text-slate-600">เลือกรูป / วิดีโอ</span>
+                    <span class="text-[8px] text-slate-400 font-mono">Image or Video</span>
+                  </div>
+                  <!-- Custom Image -->
+                  <img id="customImgElement" class="hidden w-full h-full object-cover pointer-events-none" alt="Card Media">
+                  <!-- Custom Video -->
+                  <video id="customVideoElement" class="hidden w-full h-full object-cover pointer-events-none" autoplay loop muted playsinline></video>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Footer (Prices & QR) -->
+            <div class="relative z-10 flex items-end justify-between border-t border-slate-200/70 pt-3">
+              <div class="grid grid-cols-2 gap-4 text-left">
+                <div>
+                  <span class="block text-[9px] text-slate-400 uppercase tracking-wider font-mono">ENTRY PRICE</span>
+                  <span id="previewEntry" class="text-xs font-bold font-mono text-slate-900">2,680.00</span>
+                </div>
+                <div>
+                  <span class="block text-[9px] text-slate-400 uppercase tracking-wider font-mono">EXIT PRICE</span>
+                  <span id="previewExit" class="text-xs font-bold font-mono text-slate-900">2,750.00</span>
+                </div>
+              </div>
+
+              <!-- Mini QR Code Box -->
+              <div class="flex items-center gap-2">
+                <div class="text-right hidden sm:block">
+                  <span class="text-[8px] text-slate-400 block font-mono">TRACK YOUR EDGE</span>
+                  <span class="text-[9px] font-bold text-slate-900 block">TradingJOURNAL</span>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center shadow-xs border border-slate-200">
+                  <div class="w-full h-full bg-slate-900 grid grid-cols-3 gap-0.5 p-0.5 rounded-[2px]">
+                    <div class="bg-white rounded-[1px]"></div>
+                    <div class="bg-transparent"></div>
+                    <div class="bg-white rounded-[1px]"></div>
+                    <div class="bg-transparent"></div>
+                    <div class="bg-white rounded-[1px]"></div>
+                    <div class="bg-transparent"></div>
+                    <div class="bg-white rounded-[1px]"></div>
+                    <div class="bg-white rounded-[1px]"></div>
+                    <div class="bg-white rounded-[1px]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Export Status Toast -->
+          <div id="exportToast" class="hidden mt-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-xs">
+            <span class="font-bold">✓</span> การ์ดถูกบันทึกเป็นรูปภาพเรียบร้อยแล้ว!
+          </div>
+
+        </div>
+
+      </div>
+
+      </main>
+
+  <!-- Floating Mobile Tab Bar for iPhone/Mobile Navigation -->
+  <div id="mobileBottomNav" class="md:hidden fixed bottom-3 left-4 right-4 z-40 bg-white/95 backdrop-blur-lg border border-slate-200/90 rounded-2xl shadow-xl p-1.5 flex items-center justify-around gap-1.5 transition-all">
+    <button onclick="switchTab('calendar')" id="mTab-calendar" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer">
+      <span>ปฏิทิน</span>
+    </button>
+    <button onclick="switchTab('studio')" id="mTab-studio" class="flex-1 py-2.5 px-3 rounded-xl text-slate-600 hover:text-slate-900 font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer">
+      <span>การ์ด PnL</span>
+    </button>
+  </div>
+
+  <!-- MODAL: DAY DETAIL (รายละเอียดการเทรดประจำวัน) -->
+  <div id="modalDayDetail" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-slate-200/90 shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- iOS Grabber Handle for mobile sheet -->
+      <div class="sm:hidden w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2.5 shrink-0"></div>
+
+      <!-- Modal Header -->
+      <div class="px-5 py-3 sm:py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+        <div class="flex items-center gap-3">
+          <div id="dayDetailBadgeIcon" class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-lg font-mono">
+            31
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-base text-slate-900" id="dayDetailTitle">31 ธันวาคม 2025</h3>
+              <span id="dayDetailStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                PROFITABLE
+              </span>
+            </div>
+            <p class="text-xs text-slate-400" id="dayDetailSub">บันทึกทั้งหมด 56 ไม้ • อัตราการชนะ 82.1%</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDayDetailModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200/70 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer text-sm font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+        
+        <!-- Day Stats Highlights Banner (3 Mini Cards) -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">NET P&L</span>
+            <div class="text-base sm:text-lg font-black font-mono" id="dayDetailNetPnl">+$4,309.02</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">TOTAL TRADES</span>
+            <div class="text-base sm:text-lg font-black font-mono text-slate-900" id="dayDetailTrades">56 ไม้</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">WIN RATE</span>
+            <div class="text-base sm:text-lg font-black font-mono text-emerald-600" id="dayDetailWinRate">82.1%</div>
+          </div>
+        </div>
+
+        <!-- Action Quick Bar: Add Trade to this day or Send to Studio -->
+        <div class="flex items-center gap-2">
+          <button onclick="openAddTradeForCurrentDayDetail()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+            <span>+</span>
+            <span>เพิ่มไม้ในวันนี้ (Add Trade)</span>
+          </button>
+          <button onclick="sendDayDetailToStudio()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+            <span>สร้างการ์ด PnL (Studio)</span>
+          </button>
+        </div>
+
+        <!-- Trade Breakdown List Section -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              รายการออเดอร์ในวันนี้ (Trades List)
+            </h4>
+            <span class="text-[10px] text-slate-400 font-mono" id="dayDetailTradeCountBadge">56 trades</span>
+          </div>
+
+          <!-- Trade items list container -->
+          <div id="dayDetailTradesList" class="space-y-2">
+            <!-- Dynamically populated trade items -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: ADD TRADE (เพิ่มไม้เทรด) -->
+  <div id="modalAddTrade" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-slate-200/90 shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- iOS Grabber Handle for mobile sheet -->
+      <div class="sm:hidden w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2.5 shrink-0"></div>
+
+      <!-- Modal Header -->
+      <div class="px-5 py-3 sm:py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center font-bold text-xs font-mono">
+            TR
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900" id="addTradeModalTitle">เพิ่มไม้เทรดใหม่ (Log Trade)</h3>
+            <p class="text-[11px] text-slate-400" id="addTradeModalSub">บันทึกผลลัพธ์การเข้าออเดอร์ลงปฏิทิน</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAddTradeModal()" class="w-7 h-7 rounded-lg hover:bg-slate-200/60 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer text-sm font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="addTradeForm" onsubmit="handleSaveTrade(event)" class="p-5 space-y-3.5">
+        <input type="hidden" id="editTradeId" value="">
+        
+        <!-- Row 1: Date & Pair -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">วันที่ (Date)</label>
+            <input type="date" id="tradeDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">สินทรัพย์ (Symbol / Pair)</label>
+            <input type="text" id="tradePair" required value="XAUUSD" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono uppercase text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Quick Symbol Chips -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] text-slate-400 mr-1">เลือกด่วน:</span>
+          <button type="button" onclick="setTradePair('XAUUSD')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">XAUUSD</button>
+          <button type="button" onclick="setTradePair('NQ')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">NQ</button>
+        </div>
+
+        <!-- Row 2: Direction (BUY / SELL) & Outcome -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ฝั่งการเทรด (Direction)</label>
+            <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+              <button type="button" id="btnSideBuy" onclick="setTradeDirection('BUY')" class="text-xs font-bold py-1.5 rounded-lg bg-emerald-600 text-white shadow-2xs transition-all">
+                BUY
+              </button>
+              <button type="button" id="btnSideSell" onclick="setTradeDirection('SELL')" class="text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                SELL
+              </button>
+            </div>
+            <input type="hidden" id="tradeDirection" value="BUY">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ผลลัพธ์ (Outcome)</label>
+            <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+              <button type="button" id="btnResWin" onclick="setTradeResult('WIN')" class="text-xs font-bold py-1.5 rounded-lg bg-emerald-600 text-white shadow-2xs transition-all">
+                + กำไร
+              </button>
+              <button type="button" id="btnResLoss" onclick="setTradeResult('LOSS')" class="text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                - ขาดทุน
+              </button>
+            </div>
+            <input type="hidden" id="tradeResult" value="WIN">
+          </div>
+        </div>
+
+        <!-- Row 3: Profit Amount ($ PnL) & Lot Size -->
+        <div class="grid grid-cols-2 gap-3 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">จำนวนเงิน กำไร/ขาดทุน ($ PnL)</label>
+            <div class="relative">
+              <span id="pnlSignPrefix" class="absolute left-3 top-2 text-xs font-mono font-bold text-emerald-600">+$</span>
+              <input type="number" step="0.01" id="tradePnlAmount" required placeholder="150.00" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-slate-400">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ขนาด Lot / Volume</label>
+            <input type="number" step="0.01" id="tradeLot" placeholder="0.50" value="0.50" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+          </div>
+        </div>
+
+        <!-- Row 4: Entry & Exit Price -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ราคาเข้า (Entry Price)</label>
+            <input type="text" id="tradeEntryPrice" placeholder="2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ราคาออก (Exit Price)</label>
+            <input type="text" id="tradeExitPrice" placeholder="2,710.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Row 5: Strategy / Setup -->
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">กลยุทธ์ / แผนการเข้า (Setup)</label>
+          <div class="flex items-center gap-1.5 flex-wrap mb-1.5">
+            <button type="button" onclick="setTradeSetup('Breakout')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md transition-colors">Breakout</button>
+            <button type="button" onclick="setTradeSetup('SMC / OrderBlock')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md transition-colors">SMC</button>
+            <button type="button" onclick="setTradeSetup('FVG Retest')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md transition-colors">FVG</button>
+            <button type="button" onclick="setTradeSetup('Trend Following')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md transition-colors">Trend</button>
+            <button type="button" onclick="setTradeSetup('Scalping')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md transition-colors">Scalp</button>
+          </div>
+          <input type="text" id="tradeSetup" placeholder="เช่น SMC Breakout + Confirmation" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+        </div>
+
+        <!-- Row 6: Notes -->
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">บันทึกโน้ต / อารมณ์ (Trade Notes)</label>
+          <textarea id="tradeNotes" rows="2" placeholder="จดบันทึกเหตุผลการเข้า สภาพจิตใจ หรือสิ่งที่ทำได้ดีในไม้นี้..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeAddTradeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="submit" id="addTradeSubmitBtn" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
+            <span>✓</span>
+            <span id="addTradeSubmitLabel">บันทึกไม้เทรด</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Global Floating Toast Notification -->
+  <div id="floatingToast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 hidden transition-all duration-300">
+    <span class="text-emerald-400 text-base" id="toastIcon">✓</span>
+    <span class="text-xs font-medium" id="toastMessage">บันทึกไม้เทรดสำเร็จ!</span>
+  </div>
+
+  <script>
+    let uploadedMediaObj = null;
+    let uploadedMediaType = null;
+    let bgTheme = 'media'; // 'media', 'holo', 'custom'
+    let separateBgObj = null;
+    let separateBgType = null;
+    let bgBlurAmount = 18;
+    let bgTintAmount = 75;
+
+    // Calendar Navigation State
+    let viewYear = 2025;
+    let viewMonth = 11; // 0-indexed: 11 = December
+
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const monthNamesShort = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    // Seeded Cache for December 2025 (matching reference screenshot exactly)
+    const monthDataCache = {
+      '2025-11': {
+        days: {
+          1: { pnl: 367.63, trades: 26, winPct: 65, pair: 'XAUUSD', entry: '2,640.20', exit: '2,658.50' },
+          2: { pnl: 250.77, trades: 24, winPct: 62, pair: 'XAUUSD', entry: '2,650.00', exit: '2,662.10' },
+          3: { pnl: 143.51, trades: 16, winPct: 58, pair: 'NQ', entry: '21,320', exit: '21,450' },
+          4: { pnl: 223.36, trades: 17, winPct: 60, pair: 'XAUUSD', entry: '2,655.10', exit: '2,668.00' },
+          5: { pnl: 131.62, trades: 10, winPct: 70, pair: 'NQ', entry: '21,410', exit: '21,480' },
+          8: { pnl: 194.20, trades: 20, winPct: 60, pair: 'XAUUSD', entry: '2,660.00', exit: '2,672.00' },
+          9: { pnl: -141.22, trades: 19, winPct: 35, pair: 'NQ', entry: '21,650', exit: '21,520' },
+          10: { pnl: 416.32, trades: 22, winPct: 68, pair: 'XAUUSD', entry: '2,670.00', exit: '2,691.00' },
+          11: { pnl: 501.99, trades: 21, winPct: 71, pair: 'XAUUSD', entry: '2,682.00', exit: '2,705.50' },
+          12: { pnl: -12.30, trades: 4, winPct: 50, pair: 'NQ', entry: '21,550', exit: '21,540' },
+          15: { pnl: 112.50, trades: 12, winPct: 58, pair: 'XAUUSD', entry: '2,690.00', exit: '2,696.00' },
+          16: { pnl: 32.10, trades: 8, winPct: 55, pair: 'NQ', entry: '21,580', exit: '21,610' },
+          17: { pnl: -210.58, trades: 14, winPct: 28, pair: 'XAUUSD', entry: '2,710.00', exit: '2,695.00' },
+          18: { pnl: 89.44, trades: 9, winPct: 56, pair: 'NQ', entry: '21,620', exit: '21,690' },
+          19: { pnl: 54.20, trades: 6, winPct: 66, pair: 'XAUUSD', entry: '2,705.00', exit: '2,711.00' },
+          22: { pnl: 85.10, trades: 7, winPct: 71, pair: 'XAUUSD', entry: '2,715.00', exit: '2,722.00' },
+          23: { pnl: 120.40, trades: 11, winPct: 63, pair: 'NQ', entry: '21,700', exit: '21,780' },
+          24: { pnl: 45.00, trades: 5, winPct: 60, pair: 'XAUUSD', entry: '2,720.00', exit: '2,725.00' },
+          26: { pnl: 29.35, trades: 4, winPct: 75, pair: 'NQ', entry: '21,750', exit: '21,770' },
+          29: { pnl: 3.20, trades: 3, winPct: 66, pair: 'XAUUSD', entry: '2,722.00', exit: '2,723.50' },
+          30: { pnl: -2.30, trades: 4, winPct: 50, pair: 'NQ', entry: '21,800', exit: '21,795' },
+          31: { pnl: 4309.02, trades: 56, winPct: 82, pair: 'XAUUSD', entry: '2,680.00', exit: '2,750.00' }
+        },
+        metrics: {
+          netProfit: 6743.31,
+          pct: '+24.8%',
+          winRate: '61.2',
+          trades: 358,
+          winningTrades: 219,
+          profitFactor: '4.02',
+          avgWin: '40.97',
+          avgLoss: '28.14',
+          volatility: '915.66',
+          bestDayVal: '+$4,309.02',
+          bestDaySub: 'Dec 31 (56 tr)'
+        }
+      }
+    };
+
+    // Realistic procedural data generator for any month/year
+    function getMonthData(year, month) {
+      const key = `${year}-${month}`;
+      try {
+        const stored = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
+        if (stored[key]) {
+          monthDataCache[key] = stored[key];
+          return stored[key];
+        }
+      } catch (e) {}
+
+      if (monthDataCache[key]) return monthDataCache[key];
+
+      let seed = year * 1000 + month * 73 + 109;
+      function rand() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      }
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const days = {};
+      let totalPnL = 0;
+      let totalTrades = 0;
+      let winTrades = 0;
+      let lossTrades = 0;
+      let winSum = 0;
+      let lossSum = 0;
+      let bestDay = { day: 1, pnl: -Infinity, trades: 0 };
+
+      const pairs = ['XAUUSD', 'NQ'];
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayOfWeek = new Date(year, month, d).getDay();
+        // Weekdays (Mon-Fri) trade regularly; weekends rarely
+        const isTradingDay = (dayOfWeek >= 1 && dayOfWeek <= 5) || (rand() > 0.82);
+        if (!isTradingDay) continue;
+
+        const trades = Math.floor(rand() * 20) + 5;
+        const isWin = rand() > 0.35;
+        let pnl;
+        if (isWin) {
+          pnl = Math.round((rand() * 520 + 40) * 100) / 100;
+          winSum += pnl;
+          const dayWins = Math.round(trades * (rand() * 0.3 + 0.55));
+          winTrades += dayWins;
+          lossTrades += (trades - dayWins);
+        } else {
+          pnl = -Math.round((rand() * 260 + 25) * 100) / 100;
+          lossSum += Math.abs(pnl);
+          const dayWins = Math.round(trades * (rand() * 0.25 + 0.2));
+          winTrades += dayWins;
+          lossTrades += (trades - dayWins);
+        }
+
+        const pair = pairs[Math.floor(rand() * pairs.length)];
+        let entry = pair === 'NQ' ? (21000 + Math.floor(rand() * 900)).toLocaleString() :
+                    (2600 + Math.floor(rand() * 180)).toFixed(2);
+        let exit = pair === 'NQ' ? (21000 + Math.floor(rand() * 900)).toLocaleString() :
+                   (2600 + Math.floor(rand() * 180)).toFixed(2);
+
+        days[d] = {
+          pnl: pnl,
+          trades: trades,
+          winPct: isWin ? Math.round(rand() * 20 + 60) : Math.round(rand() * 20 + 25),
+          pair: pair,
+          entry: entry,
+          exit: exit
+        };
+
+        totalPnL += pnl;
+        totalTrades += trades;
+
+        if (pnl > bestDay.pnl) {
+          bestDay = { day: d, pnl: pnl, trades: trades };
+        }
+      }
+
+      const winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0';
+      const pf = lossSum > 0 ? (winSum / lossSum).toFixed(2) : '3.85';
+      const avgWin = winTrades > 0 ? (winSum / winTrades).toFixed(2) : '42.10';
+      const avgLoss = lossTrades > 0 ? (lossSum / lossTrades).toFixed(2) : '27.40';
+
+      const generated = {
+        days: days,
+        metrics: {
+          netProfit: Math.round(totalPnL * 100) / 100,
+          pct: (totalPnL >= 0 ? '+' : '') + (totalPnL / 280).toFixed(1) + '%',
+          winRate: winRate,
+          trades: totalTrades,
+          winningTrades: winTrades,
+          profitFactor: pf,
+          avgWin: avgWin,
+          avgLoss: avgLoss,
+          volatility: (Math.abs(totalPnL) / 8 + 320).toFixed(2),
+          bestDayVal: (bestDay.pnl >= 0 ? '+$' : '-$') + Math.abs(bestDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 }),
+          bestDaySub: `${monthNamesShort[month]} ${bestDay.day} (${bestDay.trades} tr)`
+        }
+      };
+
+      monthDataCache[key] = generated;
+      return generated;
+    }
+
+    // Month Navigation Handlers
+    function changeMonth(delta) {
+      viewMonth += delta;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      } else if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+      renderCalendar();
+    }
+
+    function goToCurrentMonth() {
+      const now = new Date();
+      viewYear = now.getFullYear();
+      viewMonth = now.getMonth();
+      renderCalendar();
+    }
+
+    // Main Calendar Render Engine
+    function renderCalendar() {
+      // 1. Update Month Header Label
+      const monthLabel = document.getElementById('currentMonthYearLabel');
+      if (monthLabel) {
+        monthLabel.innerText = `${monthNames[viewMonth]} ${viewYear}`;
+      }
+
+      // 2. Fetch Data for Current View
+      const monthData = getMonthData(viewYear, viewMonth);
+      const metrics = monthData.metrics;
+
+      // 3. Update Top Summary Cards
+      const topNetProfitLabel = document.getElementById('topNetProfitLabel');
+      const topNetProfitVal = document.getElementById('topNetProfitVal');
+      const topNetProfitPct = document.getElementById('topNetProfitPct');
+      if (topNetProfitLabel) topNetProfitLabel.innerText = `TOTAL NET PROFIT (${monthNames[viewMonth].toUpperCase()} ${viewYear})`;
+      if (topNetProfitVal) {
+        topNetProfitVal.innerText = (metrics.netProfit >= 0 ? '+$' : '-$') + Math.abs(metrics.netProfit).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        topNetProfitVal.className = `text-2xl font-bold font-mono ${metrics.netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`;
+      }
+      if (topNetProfitPct) {
+        topNetProfitPct.innerText = metrics.pct;
+        topNetProfitPct.className = `text-[11px] font-bold px-1.5 py-0.5 rounded border ${metrics.netProfit >= 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200/60' : 'text-rose-700 bg-rose-50 border-rose-200/60'}`;
+      }
+
+      const topWinRateVal = document.getElementById('topWinRateVal');
+      const topWinRateSub = document.getElementById('topWinRateSub');
+      if (topWinRateVal) topWinRateVal.innerText = `${metrics.winRate}%`;
+      if (topWinRateSub) topWinRateSub.innerText = `${metrics.winningTrades} / ${metrics.trades} Trades`;
+
+      const topProfitFactorVal = document.getElementById('topProfitFactorVal');
+      const topProfitFactorSub = document.getElementById('topProfitFactorSub');
+      if (topProfitFactorVal) topProfitFactorVal.innerText = metrics.profitFactor;
+      if (topProfitFactorSub) topProfitFactorSub.innerText = `Avg Win $${metrics.avgWin}`;
+
+      const topBestDayVal = document.getElementById('topBestDayVal');
+      const topBestDaySub = document.getElementById('topBestDaySub');
+      if (topBestDayVal) topBestDayVal.innerText = metrics.bestDayVal;
+      if (topBestDaySub) topBestDaySub.innerText = metrics.bestDaySub;
+
+      // 4. Update Bottom Segmented Metric Cards
+      const bWinRateVal = document.getElementById('bottomWinRateVal');
+      const bWinRateSub = document.getElementById('bottomWinRateSub');
+      if (bWinRateVal) bWinRateVal.innerText = `${metrics.winRate}%`;
+      if (bWinRateSub) bWinRateSub.innerText = `${metrics.winningTrades} of ${metrics.trades} trades`;
+
+      const bPfVal = document.getElementById('bottomProfitFactorVal');
+      if (bPfVal) bPfVal.innerText = metrics.profitFactor;
+
+      const bAvgWinVal = document.getElementById('bottomAvgWinVal');
+      if (bAvgWinVal) bAvgWinVal.innerText = `+$${metrics.avgWin}`;
+
+      const bAvgLossVal = document.getElementById('bottomAvgLossVal');
+      if (bAvgLossVal) bAvgLossVal.innerText = `-$${metrics.avgLoss}`;
+
+      const bVolVal = document.getElementById('bottomVolatilityVal');
+      if (bVolVal) bVolVal.innerText = `$${metrics.volatility}`;
+
+      const bBestDayVal = document.getElementById('bottomBestDayVal');
+      const bBestDaySub = document.getElementById('bottomBestDaySub');
+      if (bBestDayVal) bBestDayVal.innerText = metrics.bestDayVal;
+      if (bBestDaySub) bBestDaySub.innerText = metrics.bestDaySub;
+
+      // 5. Build Calendar Grid Rows (Sun..Sat + Σ Week)
+      const container = document.getElementById('calendarGridRows');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay(); // 0 is Sunday
+      const daysInCurrentMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const totalWeeks = Math.ceil((firstDayOfWeek + daysInCurrentMonth) / 7);
+
+      for (let week = 0; week < totalWeeks; week++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'grid grid-cols-8 gap-1.5 sm:gap-2';
+
+        let weekPnL = 0;
+        let weekTrades = 0;
+
+        // Days 0..6 (Sun..Sat)
+        for (let dayCol = 0; dayCol < 7; dayCol++) {
+          const dayIndex = week * 7 + dayCol - firstDayOfWeek + 1;
+          const dayCell = document.createElement('div');
+
+          if (dayIndex < 1 || dayIndex > daysInCurrentMonth) {
+            // Empty / outside month slot
+            dayCell.className = 'bg-slate-50/40 rounded-xl p-1.5 sm:p-2 min-h-[64px] sm:min-h-[72px] flex flex-col justify-between border border-transparent opacity-30 select-none';
+            dayCell.innerHTML = `<span class="text-[11px] font-medium text-slate-300">${dayIndex < 1 ? '' : ''}</span>`;
+          } else {
+            // Inside month
+            const dayData = monthData.days[dayIndex];
+
+            if (dayData) {
+              const isWin = dayData.pnl >= 0;
+              weekPnL += dayData.pnl;
+              weekTrades += dayData.trades;
+
+              const formattedAmt = (isWin ? '+$' : '-$') + Math.abs(dayData.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+              const dateStr = `${monthNamesShort[viewMonth]} ${dayIndex}, ${viewYear}`;
+              const pnlPct = (isWin ? '+' : '') + (dayData.pnl / 15).toFixed(2) + '%';
+
+              const symFilter = document.getElementById('symbolFilter')?.value || 'ALL';
+              const matchesFilter = (symFilter === 'ALL' || dayData.pair === symFilter || (symFilter === 'XAU' && dayData.pair === 'XAUUSD'));
+              const filterClass = matchesFilter ? '' : 'opacity-20 grayscale pointer-events-none';
+
+              dayCell.className = `${isWin ? 'day-win' : 'day-loss'} rounded-xl p-1.5 sm:p-2 min-h-[64px] sm:min-h-[72px] flex flex-col justify-between cursor-pointer transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] select-none ${filterClass}`;
+              dayCell.onclick = function() {
+                pickDayForCard(
+                  dateStr,
+                  formattedAmt,
+                  `${dayData.trades} trades`,
+                  dayData.pair,
+                  'CLOSED',
+                  dayData.entry,
+                  dayData.exit,
+                  pnlPct,
+                  viewYear,
+                  viewMonth,
+                  dayIndex
+                );
+                openDayDetailModal(viewYear, viewMonth, dayIndex);
+              };
+
+              dayCell.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-bold ${isWin ? 'text-emerald-950' : 'text-rose-950'}">${dayIndex}</span>
+                  <span class="text-[9px] font-mono px-1 py-0.2 rounded font-semibold ${isWin ? 'bg-emerald-100/80 text-emerald-800' : 'bg-rose-100/80 text-rose-800'}">${dayData.pair.replace('USD','')}</span>
+                </div>
+                <div class="text-right">
+                  <div class="font-black font-mono text-[11px] sm:text-xs tracking-tight truncate ${isWin ? 'text-emerald-700' : 'text-rose-700'}">${formattedAmt}</div>
+                  <div class="text-[9px] text-slate-500 font-medium">${dayData.trades} trades</div>
+                </div>
+              `;
+            } else {
+              // Non-trading day (weekend / holiday / empty)
+              const emptyDateStr = `${monthNamesShort[viewMonth]} ${dayIndex}, ${viewYear}`;
+              dayCell.className = 'bg-slate-50/70 border border-slate-100/80 hover:border-slate-300 rounded-xl p-1.5 sm:p-2 min-h-[64px] sm:min-h-[72px] flex flex-col justify-between text-slate-400 select-none cursor-pointer transition-all';
+              dayCell.onclick = function() {
+                pickDayForCard(
+                  emptyDateStr,
+                  '$0.00',
+                  '0 trades',
+                  'XAUUSD',
+                  'PLANNING',
+                  '2,680.00',
+                  '2,710.00',
+                  '+0.00%',
+                  viewYear,
+                  viewMonth,
+                  dayIndex
+                );
+                openDayDetailModal(viewYear, viewMonth, dayIndex);
+              };
+              dayCell.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-medium text-slate-400">${dayIndex}</span>
+                  <span class="text-[10px] text-slate-300 hover:text-slate-600 font-bold">+</span>
+                </div>
+                <span class="text-[9px] text-slate-300 text-right">-</span>
+              `;
+            }
+          }
+          rowDiv.appendChild(dayCell);
+        }
+
+        // Column 8: Σ Week Summary Tile
+        const weekCell = document.createElement('div');
+        const isWeekWin = weekPnL >= 0;
+        const formattedWeekAmt = (isWeekWin ? '+$' : '-$') + Math.abs(weekPnL).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        weekCell.className = `rounded-xl p-1.5 sm:p-2 min-h-[64px] sm:min-h-[72px] flex flex-col justify-between border select-none ${isWeekWin ? 'bg-slate-100/80 border-slate-200/90 text-slate-800' : 'bg-rose-50/50 border-rose-100 text-rose-800'}`;
+        weekCell.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase text-slate-500">W${week + 1}</span>
+            <span class="text-[9px] text-slate-400 font-mono">Σ</span>
+          </div>
+          <div class="text-right">
+            <div class="font-extrabold font-mono text-[11px] sm:text-xs tracking-tight truncate ${isWeekWin ? 'text-slate-900' : 'text-rose-600'}">${formattedWeekAmt}</div>
+            <div class="text-[9px] text-slate-500 font-medium">${weekTrades} trades</div>
+          </div>
+        `;
+        rowDiv.appendChild(weekCell);
+
+        container.appendChild(rowDiv);
+      }
+    }
+
+    let selectedDateInfo = {
+      year: 2025,
+      month: 11,
+      day: 31,
+      dateStr: 'Dec 31, 2025'
+    };
+    let currentDayDetailDate = { y: 2025, m: 11, d: 31 };
+
+    // Pick Day from Calendar into PnL Card Studio & Selection State
+    function pickDayForCard(date, pnlAmt, tradesCount, pair, action, entry, exit, pnlPct, y = 2025, m = 11, d = 31) {
+      selectedDateInfo = { year: y, month: m, day: d, dateStr: date };
+      currentDayDetailDate = { y, m, d };
+
+      document.getElementById('cardPair').value = pair;
+      document.getElementById('cardStatus').value = `${date.toUpperCase()} • ${tradesCount.toUpperCase()} • ${action}`;
+      document.getElementById('cardEntry').value = entry;
+      document.getElementById('cardExit').value = exit;
+      document.getElementById('cardPnlPercent').value = pnlPct;
+      document.getElementById('cardPnlAmount').value = pnlAmt;
+
+      const title = document.getElementById('bannerDayTitle');
+      title.innerText = `เลือกวันที่ ${date} (${pnlAmt} • ${tradesCount})`;
+
+      populateQuickFillDropdown(y, m, d);
+      updateCardLive();
+      
+      const banner = document.getElementById('selectionBanner');
+      banner.classList.add('ring-2', 'ring-emerald-400');
+      setTimeout(() => banner.classList.remove('ring-2', 'ring-emerald-400'), 1200);
+    }
+
+    // Day Detail Modal Logic
+    function openDayDetailModal(y, m, d) {
+      currentDayDetailDate = { y, m, d };
+      selectedDateInfo = { year: y, month: m, day: d, dateStr: `${d} ${monthNames[m]} ${y}` };
+
+      const modal = document.getElementById('modalDayDetail');
+      if (!modal) return;
+
+      const monthData = getMonthData(y, m);
+      const dayData = (monthData.days && monthData.days[d]) ? monthData.days[d] : null;
+
+      const dateStrThai = `${d} ${monthNames[m]} ${y}`;
+      const badgeIcon = document.getElementById('dayDetailBadgeIcon');
+      const titleElem = document.getElementById('dayDetailTitle');
+      const statusBadge = document.getElementById('dayDetailStatusBadge');
+      const subElem = document.getElementById('dayDetailSub');
+      const netPnlElem = document.getElementById('dayDetailNetPnl');
+      const tradesElem = document.getElementById('dayDetailTrades');
+      const winRateElem = document.getElementById('dayDetailWinRate');
+      const countBadge = document.getElementById('dayDetailTradeCountBadge');
+
+      badgeIcon.innerText = d;
+      titleElem.innerText = dateStrThai;
+
+      if (dayData) {
+        const isWin = dayData.pnl >= 0;
+        const formattedPnl = (isWin ? '+$' : '-$') + Math.abs(dayData.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        
+        badgeIcon.className = `w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-lg font-mono ${isWin ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`;
+        statusBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${isWin ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`;
+        statusBadge.innerText = isWin ? 'PROFITABLE DAY' : 'LOSS DAY';
+
+        subElem.innerText = `บันทึกทั้งหมด ${dayData.trades} ไม้ • Win Rate ${dayData.winPct}% • สินทรัพย์หลัก ${dayData.pair}`;
+        
+        netPnlElem.innerText = formattedPnl;
+        netPnlElem.className = `text-base sm:text-lg font-black font-mono ${isWin ? 'text-emerald-600' : 'text-rose-600'}`;
+
+        tradesElem.innerText = `${dayData.trades} ไม้`;
+        winRateElem.innerText = `${dayData.winPct}%`;
+        winRateElem.className = `text-base sm:text-lg font-black font-mono ${dayData.winPct >= 50 ? 'text-emerald-600' : 'text-rose-600'}`;
+        countBadge.innerText = `${dayData.trades} trades`;
+
+        renderTradesListForDay(dayData, y, m, d);
+      } else {
+        // No trades yet on this day
+        badgeIcon.className = 'w-10 h-10 rounded-xl bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-lg font-mono';
+        statusBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600';
+        statusBadge.innerText = 'NO TRADES';
+
+        subElem.innerText = 'ยังไม่มีประวัติการเทรดบันทึกไว้ในวันนี้';
+        netPnlElem.innerText = '$0.00';
+        netPnlElem.className = 'text-base sm:text-lg font-black font-mono text-slate-400';
+        tradesElem.innerText = '0 ไม้';
+        winRateElem.innerText = '-';
+        winRateElem.className = 'text-base sm:text-lg font-black font-mono text-slate-400';
+        countBadge.innerText = '0 trades';
+
+        const tradesListContainer = document.getElementById('dayDetailTradesList');
+        if (tradesListContainer) {
+          tradesListContainer.innerHTML = `
+            <div class="text-center py-8 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
+              <p class="text-xs text-slate-500 font-medium">ยังไม่มีรายการเทรดในวันที่ ${dateStrThai}</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">กดปุ่ม "เพิ่มไม้ในวันนี้" ด้านบน เพื่อจดบันทึกออเดอร์ใหม่</p>
+            </div>
+          `;
+        }
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDayDetailModal() {
+      const modal = document.getElementById('modalDayDetail');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openAddTradeForCurrentDayDetail() {
+      closeDayDetailModal();
+      openAddTradeForSelectedDay();
+    }
+
+    function sendDayDetailToStudio() {
+      try {
+        const y = (typeof currentDayDetailDate !== 'undefined' && currentDayDetailDate) ? currentDayDetailDate.y : (selectedDateInfo ? selectedDateInfo.year : 2025);
+        const m = (typeof currentDayDetailDate !== 'undefined' && currentDayDetailDate) ? currentDayDetailDate.m : (selectedDateInfo ? selectedDateInfo.month : 11);
+        const d = (typeof currentDayDetailDate !== 'undefined' && currentDayDetailDate) ? currentDayDetailDate.d : (selectedDateInfo ? selectedDateInfo.day : 31);
+
+        const monthData = getMonthData(y, m);
+        const dayData = (monthData && monthData.days) ? monthData.days[d] : null;
+        const monthNamesEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const dateStr = `${monthNamesEn[m]} ${d}`;
+
+        const cardPair = document.getElementById('cardPair');
+        const cardStatus = document.getElementById('cardStatus');
+        const cardPnlPercent = document.getElementById('cardPnlPercent');
+        const cardPnlAmount = document.getElementById('cardPnlAmount');
+        const cardEntry = document.getElementById('cardEntry');
+        const cardExit = document.getElementById('cardExit');
+
+        populateQuickFillDropdown(y, m, d);
+
+        if (dayData) {
+          const isWin = dayData.pnl >= 0;
+          const formattedAmt = (isWin ? '+$' : '-$') + Math.abs(dayData.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const pnlPct = (isWin ? '+' : '') + (dayData.pnl / 15).toFixed(2) + '%';
+          const pair = dayData.pair || 'XAUUSD';
+
+          if (cardPair) cardPair.value = `${pair} (GOLD)`;
+          if (cardStatus) cardStatus.value = `${dateStr} • ${dayData.trades} TRADES • CLOSED`;
+          if (cardPnlPercent) cardPnlPercent.value = pnlPct;
+          if (cardPnlAmount) cardPnlAmount.value = formattedAmt;
+
+          const list = ensureDayTradesList(dayData, y, m, d);
+          if (list && list.length > 0) {
+            if (cardEntry) cardEntry.value = list[0].entry || (pair === 'NQ' ? '21,420' : '2,680.00');
+            if (cardExit) cardExit.value = list[list.length - 1].exit || (pair === 'NQ' ? '21,550' : '2,750.00');
+          } else {
+            if (cardEntry) cardEntry.value = pair === 'NQ' ? '21,420' : '2,680.00';
+            if (cardExit) cardExit.value = pair === 'NQ' ? '21,550' : '2,750.00';
+          }
+          showToast(`ดึงข้อมูลสรุปวันที่ ${dateStr} เข้าสู่ Card Studio เรียบร้อย!`);
+        } else {
+          if (cardStatus) cardStatus.value = `${dateStr} • CLOSED`;
+          showToast(`เปิด Card Studio สำหรับวันที่ ${dateStr}`);
+        }
+
+        updateCardLive();
+      } catch (err) {
+        console.error("sendDayDetailToStudio error:", err);
+      } finally {
+        closeDayDetailModal();
+        switchTab('studio');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function populateQuickFillDropdown(targetYear, targetMonth, targetDay) {
+      const select = document.getElementById('quickFillSelect');
+      if (!select) return;
+
+      const y = targetYear !== undefined ? targetYear : (currentDayDetailDate ? currentDayDetailDate.y : viewYear);
+      const m = targetMonth !== undefined ? targetMonth : (currentDayDetailDate ? currentDayDetailDate.m : viewMonth);
+      const d = targetDay !== undefined ? targetDay : (currentDayDetailDate ? currentDayDetailDate.d : 31);
+
+      const monthData = getMonthData(y, m);
+      const dayData = (monthData && monthData.days) ? monthData.days[d] : null;
+
+      let html = '';
+
+      if (dayData) {
+        const isWin = dayData.pnl >= 0;
+        const formattedAmt = (isWin ? '+$' : '-$') + Math.abs(dayData.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        const pair = dayData.pair || 'XAUUSD';
+
+        html += `<option value="day_${y}_${m}_${d}">สรุปทั้งวัน ${d} ${monthNames[m]} (${pair} • ${dayData.trades} Trades • ${formattedAmt})</option>`;
+
+        const tradesList = ensureDayTradesList(dayData, y, m, d);
+        if (tradesList && tradesList.length > 0) {
+          tradesList.forEach((trade, idx) => {
+            const tWin = trade.pnl >= 0;
+            const tAmt = (tWin ? '+$' : '-$') + Math.abs(trade.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            html += `<option value="trade_${trade.id}">ไม้เดี่ยว ${idx + 1}: ${trade.pair} ${trade.direction} ${trade.lot} Lot (${tAmt})</option>`;
+          });
+        }
+      } else {
+        html += `<option value="day_${y}_${m}_${d}">สรุปทั้งวัน ${d} ${monthNames[m]} (ยังไม่มีรายการเทรด)</option>`;
+      }
+
+      select.innerHTML = html;
+      select.value = `day_${y}_${m}_${d}`;
+    }
+
+    function applyQuickFillTrade(val) {
+      if (!val) return;
+
+      if (val.startsWith('day_')) {
+        const parts = val.split('_');
+        const y = parseInt(parts[1]);
+        const m = parseInt(parts[2]);
+        const d = parseInt(parts[3]);
+
+        const monthData = getMonthData(y, m);
+        const dayData = (monthData && monthData.days) ? monthData.days[d] : null;
+        const monthNamesEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const dateStr = `${monthNamesEn[m]} ${d}`;
+
+        const cardPair = document.getElementById('cardPair');
+        const cardStatus = document.getElementById('cardStatus');
+        const cardPnlPercent = document.getElementById('cardPnlPercent');
+        const cardPnlAmount = document.getElementById('cardPnlAmount');
+        const cardEntry = document.getElementById('cardEntry');
+        const cardExit = document.getElementById('cardExit');
+
+        if (dayData) {
+          const isWin = dayData.pnl >= 0;
+          const formattedAmt = (isWin ? '+$' : '-$') + Math.abs(dayData.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const pnlPct = (isWin ? '+' : '') + (dayData.pnl / 15).toFixed(2) + '%';
+          const pair = dayData.pair || 'XAUUSD';
+
+          if (cardPair) cardPair.value = `${pair} (GOLD)`;
+          if (cardStatus) cardStatus.value = `${dateStr} • ${dayData.trades} TRADES • CLOSED`;
+          if (cardPnlPercent) cardPnlPercent.value = pnlPct;
+          if (cardPnlAmount) cardPnlAmount.value = formattedAmt;
+
+          const list = ensureDayTradesList(dayData, y, m, d);
+          if (list && list.length > 0) {
+            if (cardEntry) cardEntry.value = list[0].entry || (pair === 'NQ' ? '21,420' : '2,680.00');
+            if (cardExit) cardExit.value = list[list.length - 1].exit || (pair === 'NQ' ? '21,550' : '2,750.00');
+          } else {
+            if (cardEntry) cardEntry.value = pair === 'NQ' ? '21,420' : '2,680.00';
+            if (cardExit) cardExit.value = pair === 'NQ' ? '21,550' : '2,750.00';
+          }
+          showToast(`ดึงข้อมูลสรุปวันที่ ${dateStr} เรียบร้อย!`);
+        } else {
+          if (cardStatus) cardStatus.value = `${dateStr} • CLOSED`;
+          showToast(`สลับไปวันที่ ${dateStr}`);
+        }
+      } else if (val.startsWith('trade_')) {
+        const tradeId = val.replace('trade_', '');
+        const y = currentDayDetailDate ? currentDayDetailDate.y : viewYear;
+        const m = currentDayDetailDate ? currentDayDetailDate.m : viewMonth;
+        const monthData = getMonthData(y, m);
+        let foundTrade = null;
+        let foundDate = null;
+
+        if (monthData && monthData.days) {
+          for (const dayKey in monthData.days) {
+            const dNum = parseInt(dayKey);
+            const list = ensureDayTradesList(monthData.days[dNum], y, m, dNum);
+            const t = list.find(item => item.id === tradeId);
+            if (t) {
+              foundTrade = t;
+              foundDate = dNum;
+              break;
+            }
+          }
+        }
+
+        if (foundTrade) {
+          const tWin = foundTrade.pnl >= 0;
+          const formattedAmt = (tWin ? '+$' : '-$') + Math.abs(foundTrade.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const pnlPct = (tWin ? '+' : '') + (foundTrade.pnl / 15).toFixed(2) + '%';
+          const monthNamesEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+          const dateStr = `${monthNamesEn[m]} ${foundDate}`;
+
+          document.getElementById('cardPair').value = `${foundTrade.pair} (${foundTrade.lot || '1.00'} Lot)`;
+          document.getElementById('cardStatus').value = `${dateStr} • ${foundTrade.direction} • ${foundTrade.setup || 'CLOSED'}`;
+          document.getElementById('cardPnlPercent').value = pnlPct;
+          document.getElementById('cardPnlAmount').value = formattedAmt;
+          document.getElementById('cardEntry').value = foundTrade.entry || (foundTrade.pair === 'NQ' ? '21,420' : '2,680.00');
+          document.getElementById('cardExit').value = foundTrade.exit || (foundTrade.pair === 'NQ' ? '21,550' : '2,750.00');
+          showToast(`ดึงข้อมูลไม้ ${foundTrade.pair} (${formattedAmt}) เรียบร้อย!`);
+        }
+      }
+      updateCardLive();
+    }
+
+    function ensureDayTradesList(dayData, y, m, d) {
+      if (dayData.tradesList && Array.isArray(dayData.tradesList)) {
+        return dayData.tradesList;
+      }
+
+      // Initialize tradesList for this day
+      const list = [];
+      if (y === 2025 && m === 11 && d === 31) {
+        list.push(
+          { id: 'tr_31_1', pair: 'XAUUSD', direction: 'BUY', lot: 1.50, entry: '2,680.00', exit: '2,715.00', pnl: 2450.00, setup: 'SMC OrderBlock', time: '09:15 UTC', notes: 'เข้าตามโครงสร้าง M15' },
+          { id: 'tr_31_2', pair: 'XAUUSD', direction: 'BUY', lot: 1.00, entry: '2,710.00', exit: '2,735.00', pnl: 1280.00, setup: 'Breakout Retest', time: '13:40 UTC', notes: 'เบรคต้านแล้วตามเทรนด์' },
+          { id: 'tr_31_3', pair: 'NQ', direction: 'BUY', lot: 1.00, entry: '21,420', exit: '21,550', pnl: 420.00, setup: 'Trend Following', time: '16:22 UTC', notes: 'ตามเทรนด์ H1' },
+          { id: 'tr_31_4', pair: 'XAUUSD', direction: 'BUY', lot: 0.50, entry: '2,740.00', exit: '2,750.00', pnl: 289.02, setup: 'Scalp M1', time: '18:05 UTC', notes: 'เก็บสั้นช่วงปิดวัน' },
+          { id: 'tr_31_5', pair: 'NQ', direction: 'SELL', lot: 1.00, entry: '21,610', exit: '21,635', pnl: -130.00, setup: 'FVG Reversal', time: '20:10 UTC', notes: 'SL สั้นคุมความเสี่ยง' }
+        );
+      } else {
+        const pair = dayData.pair || 'XAUUSD';
+        const isWin = dayData.pnl >= 0;
+        const count = Math.min(dayData.trades || 1, 4);
+        let remainingPnl = dayData.pnl;
+
+        for (let i = 1; i <= count; i++) {
+          const isLast = (i === count);
+          let tradePnl;
+          if (isLast) {
+            tradePnl = Math.round(remainingPnl * 100) / 100;
+          } else {
+            const portion = isWin ? (remainingPnl * (0.35 + (i * 0.05))) : (remainingPnl * 0.4);
+            tradePnl = Math.round(portion * 100) / 100;
+            remainingPnl -= tradePnl;
+          }
+
+          const tWin = tradePnl >= 0;
+          const dir = tWin ? 'BUY' : 'SELL';
+          const setup = tWin ? ['Breakout', 'SMC OrderBlock', 'Trend Following', 'FVG Retest'][i % 4] : ['News Spike', 'Stop Hunt', 'Liquidity Sweep'][i % 3];
+
+          const sampleNotes = [
+            'เข้าตามโครงสร้าง M15',
+            'Breakout แนวต้าน Volume สนับสนุน RR 1:2',
+            'Pullback เข้าตามเทรนด์ H1',
+            'Scalp สั้นคุมความเสี่ยงตามแผน'
+          ];
+          const tradeNote = sampleNotes[(i - 1) % sampleNotes.length];
+
+          list.push({
+            id: `tr_${y}_${m}_${d}_${i}`,
+            pair: pair,
+            direction: dir,
+            lot: (0.2 + i * 0.2).toFixed(2),
+            entry: dayData.entry || '2,680.00',
+            exit: dayData.exit || '2,710.00',
+            pnl: tradePnl,
+            setup: setup,
+            time: `1${i}:30 UTC`,
+            notes: tradeNote
+          });
+        }
+      }
+
+      dayData.tradesList = list;
+      return list;
+    }
+
+    function renderTradesListForDay(dayData, y, m, d) {
+      const container = document.getElementById('dayDetailTradesList');
+      if (!container) return;
+
+      const list = ensureDayTradesList(dayData, y, m, d);
+      const dateStr = `${monthNamesShort[m]} ${d}, ${y}`;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
+            <p class="text-xs text-slate-500 font-medium">ไม่มีรายการไม้เทรดในวันนี้</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      list.forEach((trade) => {
+        const tWin = trade.pnl >= 0;
+        const formattedAmt = (tWin ? '+$' : '-$') + Math.abs(trade.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        const pnlPct = (tWin ? '+' : '') + (trade.pnl / 15).toFixed(2) + '%';
+        const dir = trade.direction || (tWin ? 'BUY' : 'SELL');
+        const displayNote = trade.notes || 'เข้าตามโครงสร้าง M15';
+
+        html += `
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex flex-col justify-between gap-2.5 hover:border-slate-300 transition-colors">
+            <!-- Row 1: Badges, Info, PnL & Action Buttons -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-start sm:items-center gap-3">
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-md ${dir === 'BUY' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} font-mono shrink-0">${dir}</span>
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-xs font-bold font-mono text-slate-900">${trade.pair}</span>
+                    <span class="text-[11px] text-slate-400 font-mono">${trade.lot} Lot</span>
+                    <span class="text-[10px] bg-slate-200/70 text-slate-700 px-1.5 py-0.2 rounded font-medium">${trade.setup || 'Standard'}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">
+                    Entry: ${trade.entry || '-'} → Exit: ${trade.exit || '-'}${trade.time ? ' • ' + trade.time : ''}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between sm:justify-end gap-2.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
+                <span class="text-xs font-black font-mono ${tWin ? 'text-emerald-600' : 'text-rose-600'}">${formattedAmt}</span>
+                
+                <!-- Action Buttons: Card, Edit, Delete -->
+                <div class="flex items-center gap-1.5">
+                  <button onclick="pickSingleTradeForCard('${trade.pair}', '${formattedAmt}', '${trade.lot} Lot', '${trade.entry || '0'}', '${trade.exit || '0'}', '${pnlPct}', '${dateStr}', '${trade.id}', ${y}, ${m}, ${d})" title="สร้างการ์ด PnL" class="text-[10px] bg-white border border-slate-200 hover:border-slate-300 px-2 py-1 rounded-lg text-slate-700 font-semibold shadow-2xs transition-all cursor-pointer">
+                    การ์ด
+                  </button>
+                  <button onclick="editTrade('${trade.id}', ${y}, ${m}, ${d})" title="แก้ไขไม้นี้" class="text-[10px] bg-white border border-slate-200 hover:border-slate-400 hover:bg-slate-100 px-2 py-1 rounded-lg text-slate-700 font-semibold shadow-2xs transition-all cursor-pointer">
+                    แก้ไข
+                  </button>
+                  <button onclick="deleteTrade('${trade.id}', ${y}, ${m}, ${d})" title="ลบไม้นี้" class="text-[10px] bg-white border border-rose-200 hover:bg-rose-50 hover:border-rose-300 px-2 py-1 rounded-lg text-rose-600 font-semibold shadow-2xs transition-all cursor-pointer">
+                    ลบ
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Clean Trade Note Container -->
+            <div class="bg-amber-50/70 border border-amber-200/80 rounded-lg px-2.5 py-1.5 text-amber-950">
+              <div class="text-[11px] leading-relaxed">
+                <span class="font-bold text-amber-900 mr-1">บันทึกโน้ต:</span>
+                <span class="font-medium text-slate-800">${displayNote}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function pickSingleTradeForCard(pair, pnlAmt, lot, entry, exit, pnlPct, dateStr, tradeId = null, y = 2025, m = 11, d = 31) {
+      closeDayDetailModal();
+      document.getElementById('cardPair').value = `${pair} (${lot})`;
+      document.getElementById('cardStatus').value = `${dateStr.toUpperCase()} • CLOSED`;
+      document.getElementById('cardEntry').value = entry;
+      document.getElementById('cardExit').value = exit;
+      document.getElementById('cardPnlPercent').value = pnlPct;
+      document.getElementById('cardPnlAmount').value = pnlAmt;
+
+      populateQuickFillDropdown(y, m, d);
+      if (tradeId) {
+        const select = document.getElementById('quickFillSelect');
+        if (select) select.value = 'trade_' + tradeId;
+      }
+
+      updateCardLive();
+      switchTab('studio');
+      showToast(`โหลดไม้ ${pair} (${pnlAmt}) เข้าสตูดิโอเรียบร้อย!`);
+    }
+
+    function editTrade(tradeId, y, m, d) {
+      const monthData = getMonthData(y, m);
+      if (!monthData.days || !monthData.days[d]) return;
+
+      const list = ensureDayTradesList(monthData.days[d], y, m, d);
+      const trade = list.find(t => t.id === tradeId);
+      if (!trade) return;
+
+      closeDayDetailModal();
+
+      // Populate form with trade data
+      document.getElementById('editTradeId').value = trade.id;
+      
+      const mPadded = String(m + 1).padStart(2, '0');
+      const dPadded = String(d).padStart(2, '0');
+      document.getElementById('tradeDate').value = `${y}-${mPadded}-${dPadded}`;
+      
+      document.getElementById('tradePair').value = trade.pair;
+      setTradeDirection(trade.direction || (trade.pnl >= 0 ? 'BUY' : 'SELL'));
+      setTradeResult(trade.pnl >= 0 ? 'WIN' : 'LOSS');
+      document.getElementById('tradePnlAmount').value = Math.abs(trade.pnl).toFixed(2);
+      document.getElementById('tradeLot').value = trade.lot || 0.50;
+      document.getElementById('tradeEntryPrice').value = trade.entry || '';
+      document.getElementById('tradeExitPrice').value = trade.exit || '';
+      document.getElementById('tradeSetup').value = trade.setup || '';
+      document.getElementById('tradeNotes').value = trade.notes || '';
+
+      // Update modal header & button text
+      document.getElementById('addTradeModalTitle').innerText = 'แก้ไขไม้เทรด (Edit Trade)';
+      document.getElementById('addTradeModalSub').innerText = `แก้ไขข้อมูลไม้ ${trade.pair} วันที่ ${d} ${monthNames[m]} ${y}`;
+      document.getElementById('addTradeSubmitLabel').innerText = 'บันทึกการแก้ไข';
+
+      document.getElementById('modalAddTrade').classList.remove('hidden');
+    }
+
+    function deleteTrade(tradeId, y, m, d) {
+      if (!confirm('ยืนยันการลบไม้เทรดนี้ใช่หรือไม่?')) return;
+
+      const monthData = getMonthData(y, m);
+      if (!monthData.days || !monthData.days[d]) return;
+
+      const list = ensureDayTradesList(monthData.days[d], y, m, d);
+      const idx = list.findIndex(t => t.id === tradeId);
+      if (idx === -1) return;
+
+      const deleted = list[idx];
+      list.splice(idx, 1);
+
+      // Recalculate day
+      if (list.length === 0) {
+        delete monthData.days[d];
+      } else {
+        monthData.days[d].trades = list.length;
+        monthData.days[d].pnl = Math.round(list.reduce((sum, t) => sum + t.pnl, 0) * 100) / 100;
+        const wins = list.filter(t => t.pnl >= 0).length;
+        monthData.days[d].winPct = Math.round((wins / list.length) * 100);
+        monthData.days[d].pair = list[0].pair;
+        monthData.days[d].entry = list[0].entry;
+        monthData.days[d].exit = list[0].exit;
+      }
+
+      // Recalculate month
+      recalculateMonthMetrics(monthData, y, m);
+      saveMonthDataToStorage(y, m, monthData);
+
+      renderCalendar();
+      openDayDetailModal(y, m, d);
+
+      showToast(`ลบไม้ ${deleted.pair} (${deleted.pnl >= 0 ? '+$' : '-$'}${Math.abs(deleted.pnl).toFixed(2)}) เรียบร้อยแล้ว!`);
+    }
+
+    function recalculateMonthMetrics(monthData, y, m) {
+      let totalPnL = 0;
+      let totalTrades = 0;
+      let winTrades = 0;
+      let lossTrades = 0;
+      let winSum = 0;
+      let lossSum = 0;
+      let bestDay = { day: 1, pnl: -Infinity, trades: 0 };
+
+      for (const [dayKey, dayItem] of Object.entries(monthData.days)) {
+        totalPnL += dayItem.pnl;
+        totalTrades += dayItem.trades;
+        if (dayItem.pnl >= 0) {
+          winSum += dayItem.pnl;
+          winTrades += Math.ceil(dayItem.trades * 0.6);
+        } else {
+          lossSum += Math.abs(dayItem.pnl);
+          lossTrades += Math.ceil(dayItem.trades * 0.4);
+        }
+        if (dayItem.pnl > bestDay.pnl) {
+          bestDay = { day: Number(dayKey), pnl: dayItem.pnl, trades: dayItem.trades };
+        }
+      }
+
+      monthData.metrics.netProfit = Math.round(totalPnL * 100) / 100;
+      monthData.metrics.trades = totalTrades;
+      monthData.metrics.winningTrades = winTrades;
+      monthData.metrics.winRate = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) : '0.0';
+      monthData.metrics.profitFactor = lossSum > 0 ? (winSum / lossSum).toFixed(2) : '4.00';
+      monthData.metrics.bestDayVal = (bestDay.pnl >= 0 ? '+$' : '-$') + Math.abs(bestDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      monthData.metrics.bestDaySub = `${monthNamesShort[m]} ${bestDay.day} (${bestDay.trades} tr)`;
+    }
+
+    function saveMonthDataToStorage(y, m, monthData) {
+      try {
+        const stored = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
+        stored[`${y}-${m}`] = monthData;
+        localStorage.setItem('tradingjournal_custom_data', JSON.stringify(stored));
+      } catch (err) {
+        console.warn('Storage error', err);
+      }
+    }
+
+    // Modal Add Trade Controls
+    function openAddTradeModal(prefillDate) {
+      const modal = document.getElementById('modalAddTrade');
+      const dateInput = document.getElementById('tradeDate');
+      
+      // Reset edit state
+      document.getElementById('editTradeId').value = '';
+      document.getElementById('addTradeModalTitle').innerText = 'เพิ่มไม้เทรดใหม่ (Log Trade)';
+      document.getElementById('addTradeModalSub').innerText = 'บันทึกผลลัพธ์การเข้าออเดอร์ลงปฏิทิน';
+      document.getElementById('addTradeSubmitLabel').innerText = 'บันทึกไม้เทรด';
+
+      if (prefillDate) {
+        dateInput.value = prefillDate;
+      } else if (selectedDateInfo) {
+        const y = selectedDateInfo.year;
+        const m = String(selectedDateInfo.month + 1).padStart(2, '0');
+        const d = String(selectedDateInfo.day).padStart(2, '0');
+        dateInput.value = `${y}-${m}-${d}`;
+      } else {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        dateInput.value = `${y}-${m}-${d}`;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function openAddTradeForSelectedDay() {
+      if (selectedDateInfo) {
+        const y = selectedDateInfo.year;
+        const m = String(selectedDateInfo.month + 1).padStart(2, '0');
+        const d = String(selectedDateInfo.day).padStart(2, '0');
+        openAddTradeModal(`${y}-${m}-${d}`);
+      } else {
+        openAddTradeModal();
+      }
+    }
+
+    function closeAddTradeModal() {
+      document.getElementById('modalAddTrade').classList.add('hidden');
+    }
+
+    function setTradePair(pair) {
+      document.getElementById('tradePair').value = pair;
+    }
+
+    function setTradeDirection(dir) {
+      document.getElementById('tradeDirection').value = dir;
+      const bBuy = document.getElementById('btnSideBuy');
+      const bSell = document.getElementById('btnSideSell');
+      if (dir === 'BUY') {
+        bBuy.className = 'text-xs font-bold py-1.5 rounded-lg bg-emerald-600 text-white shadow-2xs transition-all';
+        bSell.className = 'text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+      } else {
+        bSell.className = 'text-xs font-bold py-1.5 rounded-lg bg-rose-600 text-white shadow-2xs transition-all';
+        bBuy.className = 'text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+      }
+    }
+
+    function setTradeResult(res) {
+      document.getElementById('tradeResult').value = res;
+      const bWin = document.getElementById('btnResWin');
+      const bLoss = document.getElementById('btnResLoss');
+      const pnlPrefix = document.getElementById('pnlSignPrefix');
+      const pnlAmtInput = document.getElementById('tradePnlAmount');
+
+      if (res === 'WIN') {
+        bWin.className = 'text-xs font-bold py-1.5 rounded-lg bg-emerald-600 text-white shadow-2xs transition-all';
+        bLoss.className = 'text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+        pnlPrefix.innerText = '+$';
+        pnlPrefix.className = 'absolute left-3 top-2 text-xs font-mono font-bold text-emerald-600';
+        pnlAmtInput.className = 'w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-slate-400';
+      } else {
+        bLoss.className = 'text-xs font-bold py-1.5 rounded-lg bg-rose-600 text-white shadow-2xs transition-all';
+        bWin.className = 'text-xs font-bold py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+        pnlPrefix.innerText = '-$';
+        pnlPrefix.className = 'absolute left-3 top-2 text-xs font-mono font-bold text-rose-600';
+        pnlAmtInput.className = 'w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono font-bold text-rose-600 focus:outline-none focus:border-slate-400';
+      }
+    }
+
+    function setTradeSetup(setup) {
+      document.getElementById('tradeSetup').value = setup;
+    }
+
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('floatingToast');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      if (!toast) return;
+      toastMsg.innerText = msg;
+      toastIcon.innerText = isSuccess ? '✓' : 'ℹ';
+      toastIcon.className = isSuccess ? 'text-emerald-400 text-base font-bold' : 'text-slate-400 text-base';
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    function handleSaveTrade(e) {
+      e.preventDefault();
+
+      const editId = document.getElementById('editTradeId').value;
+      const dateStr = document.getElementById('tradeDate').value;
+      if (!dateStr) return;
+
+      const [yStr, mStr, dStr] = dateStr.split('-');
+      const targetYear = parseInt(yStr, 10);
+      const targetMonth = parseInt(mStr, 10) - 1; // 0-indexed month
+      const targetDay = parseInt(dStr, 10);
+
+      const pair = document.getElementById('tradePair').value.toUpperCase().trim() || 'XAUUSD';
+      const direction = document.getElementById('tradeDirection').value;
+      const result = document.getElementById('tradeResult').value;
+      const rawAmt = parseFloat(document.getElementById('tradePnlAmount').value) || 0;
+      const signedPnl = result === 'LOSS' ? -Math.abs(rawAmt) : Math.abs(rawAmt);
+      const lot = parseFloat(document.getElementById('tradeLot').value) || 0.50;
+      const entry = document.getElementById('tradeEntryPrice').value.trim() || '2,680.00';
+      const exit = document.getElementById('tradeExitPrice').value.trim() || '2,710.00';
+      const setup = document.getElementById('tradeSetup').value.trim();
+      const notes = document.getElementById('tradeNotes').value.trim();
+
+      // Retrieve or init month data
+      const monthData = getMonthData(targetYear, targetMonth);
+      if (!monthData.days) monthData.days = {};
+
+      if (!monthData.days[targetDay]) {
+        monthData.days[targetDay] = {
+          pnl: 0,
+          trades: 0,
+          winPct: 100,
+          pair: pair,
+          entry: entry,
+          exit: exit,
+          tradesList: []
+        };
+      }
+
+      const list = ensureDayTradesList(monthData.days[targetDay], targetYear, targetMonth, targetDay);
+
+      if (editId) {
+        // Edit existing trade
+        const existingTrade = list.find(t => t.id === editId);
+        if (existingTrade) {
+          existingTrade.pair = pair;
+          existingTrade.direction = direction;
+          existingTrade.lot = lot;
+          existingTrade.entry = entry;
+          existingTrade.exit = exit;
+          existingTrade.pnl = signedPnl;
+          existingTrade.setup = setup;
+          existingTrade.notes = notes;
+        }
+      } else {
+        // Add new trade
+        const newTrade = {
+          id: 'tr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          pair: pair,
+          direction: direction,
+          lot: lot,
+          entry: entry,
+          exit: exit,
+          pnl: signedPnl,
+          setup: setup || 'Standard Entry',
+          notes: notes,
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
+        list.unshift(newTrade);
+      }
+
+      // Recalculate day
+      monthData.days[targetDay].trades = list.length;
+      monthData.days[targetDay].pnl = Math.round(list.reduce((sum, t) => sum + t.pnl, 0) * 100) / 100;
+      const wins = list.filter(t => t.pnl >= 0).length;
+      monthData.days[targetDay].winPct = Math.round((wins / list.length) * 100);
+      monthData.days[targetDay].pair = pair;
+      monthData.days[targetDay].entry = entry;
+      monthData.days[targetDay].exit = exit;
+
+      // Recalculate month
+      recalculateMonthMetrics(monthData, targetYear, targetMonth);
+      saveMonthDataToStorage(targetYear, targetMonth, monthData);
+
+      // Switch view if needed
+      viewYear = targetYear;
+      viewMonth = targetMonth;
+
+      renderCalendar();
+      closeAddTradeModal();
+
+      // Re-open day detail modal with updated trades
+      openDayDetailModal(targetYear, targetMonth, targetDay);
+
+      const updatedDay = monthData.days[targetDay];
+      const dateDisplay = `${monthNamesShort[targetMonth]} ${targetDay}, ${targetYear}`;
+      const formattedAmt = (updatedDay.pnl >= 0 ? '+$' : '-$') + Math.abs(updatedDay.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      const pnlPct = (updatedDay.pnl >= 0 ? '+' : '') + (updatedDay.pnl / 15).toFixed(2) + '%';
+      pickDayForCard(dateDisplay, formattedAmt, `${updatedDay.trades} trades`, updatedDay.pair, 'CLOSED', updatedDay.entry, updatedDay.exit, pnlPct, targetYear, targetMonth, targetDay);
+
+      showToast(editId ? `อัปเดตไม้ ${pair} เรียบร้อยแล้ว!` : `บันทึกไม้ ${pair} ${direction} (${signedPnl >= 0 ? '+$' : '-$'}${Math.abs(signedPnl).toFixed(2)}) เรียบร้อยแล้ว!`);
+    }
+
+    // Handle Image or Video Upload
+    function handleMediaUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const customImgElem = document.getElementById('customImgElement');
+      const customVideoElem = document.getElementById('customVideoElement');
+      const placeholder = document.getElementById('mediaPlaceholder');
+      const btnClear = document.getElementById('btnClearMedia');
+      const uploadLabel = document.getElementById('uploadLabel');
+      const mediaControls = document.getElementById('mediaControls');
+
+      if (file.type.startsWith('video/')) {
+        // Video file (MP4, MOV, WebM)
+        uploadedMediaType = 'video';
+        const videoUrl = URL.createObjectURL(file);
+        customVideoElem.src = videoUrl;
+        customVideoElem.classList.remove('hidden');
+        customVideoElem.play().catch(() => {});
+        customImgElem.classList.add('hidden');
+        if (placeholder) placeholder.classList.add('hidden');
+
+        uploadedMediaObj = customVideoElem;
+        btnClear.classList.remove('hidden');
+        uploadLabel.innerText = file.name.substring(0, 20) + "...";
+        mediaControls.classList.remove('hidden');
+        showToast("โหลดวิดีโอเข้าการ์ดสำเร็จ!");
+        updateBackgroundVisual();
+      } else {
+        // Image file (JPG, PNG, GIF, WebP)
+        uploadedMediaType = 'image';
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            uploadedMediaObj = img;
+            customImgElem.src = event.target.result;
+            customImgElem.classList.remove('hidden');
+            customVideoElem.pause();
+            customVideoElem.classList.add('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+
+            btnClear.classList.remove('hidden');
+            uploadLabel.innerText = file.name.substring(0, 20) + "...";
+            mediaControls.classList.remove('hidden');
+            showToast("โหลดรูปภาพเข้าการ์ดสำเร็จ!");
+            updateBackgroundVisual();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearCustomMedia() {
+      uploadedMediaObj = null;
+      uploadedMediaType = null;
+      const customImgElem = document.getElementById('customImgElement');
+      const customVideoElem = document.getElementById('customVideoElement');
+      const placeholder = document.getElementById('mediaPlaceholder');
+
+      customImgElem.classList.add('hidden');
+      customImgElem.src = "";
+      customVideoElem.pause();
+      customVideoElem.classList.add('hidden');
+      customVideoElem.src = "";
+      if (placeholder) placeholder.classList.remove('hidden');
+
+      document.getElementById('btnClearMedia').classList.add('hidden');
+      document.getElementById('mediaControls').classList.add('hidden');
+      document.getElementById('uploadLabel').innerText = "เลือกรูปภาพหรือวิดีโอจากเครื่อง";
+      document.getElementById('mediaInput').value = "";
+      updateBackgroundVisual();
+    }
+
+    function updateMediaSize() {
+      const val = document.getElementById('mediaScale').value;
+      const container = document.getElementById('previewImageContainer');
+      container.style.width = `${val}px`;
+      container.style.height = `${val}px`;
+    }
+
+    function updateMediaOpacity() {
+      const val = document.getElementById('mediaOpacity').value;
+      const customImgElem = document.getElementById('customImgElement');
+      const customVideoElem = document.getElementById('customVideoElement');
+      customImgElem.style.opacity = val / 100;
+      customVideoElem.style.opacity = val / 100;
+    }
+
+    // Card Background & Blur Engine
+    function updateBackgroundVisual() {
+      const bgImg = document.getElementById('cardBgImg');
+      const bgVideo = document.getElementById('cardBgVideo');
+      if (!bgImg || !bgVideo) return;
+
+      bgImg.classList.add('hidden');
+      bgVideo.classList.add('hidden');
+      bgVideo.pause();
+
+      if (bgTheme === 'media') {
+        if (uploadedMediaType === 'video' && uploadedMediaObj) {
+          bgVideo.src = uploadedMediaObj.src;
+          bgVideo.classList.remove('hidden');
+          bgVideo.play().catch(() => {});
+        } else if (uploadedMediaType === 'image' && uploadedMediaObj) {
+          bgImg.src = uploadedMediaObj.src;
+          bgImg.classList.remove('hidden');
+        }
+      } else if (bgTheme === 'custom') {
+        if (separateBgType === 'video' && separateBgObj) {
+          bgVideo.src = separateBgObj.src;
+          bgVideo.classList.remove('hidden');
+          bgVideo.play().catch(() => {});
+        } else if (separateBgType === 'image' && separateBgObj) {
+          bgImg.src = separateBgObj.src;
+          bgImg.classList.remove('hidden');
+        }
+      }
+
+      updateBgBlur();
+      updateBgTint();
+    }
+
+    function updateBgBlur() {
+      const val = document.getElementById('bgBlurRange')?.value || 18;
+      bgBlurAmount = parseInt(val, 10);
+      const lbl = document.getElementById('blurValLabel');
+      if (lbl) lbl.innerText = `${val}px`;
+
+      const bgImg = document.getElementById('cardBgImg');
+      const bgVideo = document.getElementById('cardBgVideo');
+      if (bgImg) bgImg.style.filter = `blur(${val}px)`;
+      if (bgVideo) bgVideo.style.filter = `blur(${val}px)`;
+    }
+
+    function updateBgTint() {
+      const val = document.getElementById('bgTintRange')?.value || 75;
+      bgTintAmount = parseInt(val, 10);
+      const lbl = document.getElementById('tintValLabel');
+      if (lbl) lbl.innerText = `${val}%`;
+
+      const bgTint = document.getElementById('cardBgTint');
+      if (bgTint) bgTint.style.backgroundColor = `rgba(255, 255, 255, ${val / 100})`;
+    }
+
+    function setBgTheme(theme) {
+      bgTheme = theme;
+      ['media', 'holo', 'custom'].forEach(t => {
+        const btn = document.getElementById(`btnBg-${t}`);
+        if (btn) {
+          if (t === theme) {
+            btn.className = "border-2 border-slate-900 bg-white p-2 rounded-xl text-center text-xs font-semibold text-slate-900 shadow-2xs transition-all flex flex-col items-center gap-1 cursor-pointer";
+          } else {
+            btn.className = "border border-slate-200 hover:border-slate-400 bg-white p-2 rounded-xl text-center text-xs font-semibold text-slate-600 shadow-2xs transition-all flex flex-col items-center gap-1 cursor-pointer";
+          }
+        }
+      });
+
+      const customRow = document.getElementById('customBgUploadRow');
+      if (customRow) {
+        if (theme === 'custom') {
+          customRow.classList.remove('hidden');
+        } else {
+          customRow.classList.add('hidden');
+        }
+      }
+
+      updateBackgroundVisual();
+    }
+
+    function handleSeparateBgUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const label = document.getElementById('bgUploadLabel');
+      if (file.type.startsWith('video/')) {
+        separateBgType = 'video';
+        const videoUrl = URL.createObjectURL(file);
+        const vid = document.createElement('video');
+        vid.src = videoUrl;
+        vid.autoplay = true;
+        vid.loop = true;
+        vid.muted = true;
+        vid.playsInline = true;
+        separateBgObj = vid;
+        if (label) label.innerText = file.name.substring(0, 20) + "...";
+        showToast("โหลดวิดีโอพื้นหลังแยกเรียบร้อย!");
+      } else {
+        separateBgType = 'image';
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            separateBgObj = img;
+            if (label) label.innerText = file.name.substring(0, 20) + "...";
+            showToast("โหลดรูปภาพพื้นหลังแยกเรียบร้อย!");
+            updateBackgroundVisual();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+      updateBackgroundVisual();
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+      const vCalendar = document.getElementById('view-calendar');
+      const vStudio = document.getElementById('view-studio');
+      const tCalendar = document.getElementById('tab-calendar');
+      const tStudio = document.getElementById('tab-studio');
+      const mTabCalendar = document.getElementById('mTab-calendar');
+      const mTabStudio = document.getElementById('mTab-studio');
+      const inTabCalendar = document.getElementById('inPhone-tab-calendar');
+      const inTabStudio = document.getElementById('inPhone-tab-studio');
+
+      if (tab === 'calendar') {
+        vCalendar.classList.remove('hidden');
+        vStudio.classList.add('hidden');
+        if (tCalendar) tCalendar.className = "flex-1 md:flex-none text-xs font-semibold px-4 py-2 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-2";
+        if (tStudio) tStudio.className = "flex-1 md:flex-none text-xs font-semibold px-4 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+        if (mTabCalendar) mTabCalendar.className = "flex-1 py-2.5 px-3 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer";
+        if (mTabStudio) mTabStudio.className = "flex-1 py-2.5 px-3 rounded-xl text-slate-600 hover:text-slate-900 font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer";
+        if (inTabCalendar) inTabCalendar.className = "flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer";
+        if (inTabStudio) inTabStudio.className = "flex-1 py-2 px-3 rounded-xl text-slate-500 hover:text-slate-900 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer";
+      } else {
+        vCalendar.classList.add('hidden');
+        vStudio.classList.remove('hidden');
+        if (tStudio) tStudio.className = "flex-1 md:flex-none text-xs font-semibold px-4 py-2 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-2";
+        if (tCalendar) tCalendar.className = "flex-1 md:flex-none text-xs font-semibold px-4 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+        if (mTabStudio) mTabStudio.className = "flex-1 py-2.5 px-3 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer";
+        if (mTabCalendar) mTabCalendar.className = "flex-1 py-2.5 px-3 rounded-xl text-slate-600 hover:text-slate-900 font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer";
+        if (inTabStudio) inTabStudio.className = "flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer";
+        if (inTabCalendar) inTabCalendar.className = "flex-1 py-2 px-3 rounded-xl text-slate-500 hover:text-slate-900 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer";
+      }
+    }
+
+    // Device View Simulator (Desktop / iPad / iPhone)
+    let currentDeviceView = 'desktop';
+    function setDeviceView(mode) {
+      currentDeviceView = mode;
+      const frame = document.getElementById('deviceFrame');
+      const statusBar = document.getElementById('iosStatusBar');
+      const homeBar = document.getElementById('iosHomeBar');
+      const mobileNav = document.getElementById('mobileBottomNav');
+      const inDeviceNav = document.getElementById('inDeviceBottomNav');
+
+      const btnDesktop = document.getElementById('devBtn-desktop');
+      const btnIpad = document.getElementById('devBtn-ipad');
+      const btnIphone = document.getElementById('devBtn-iphone');
+
+      [btnDesktop, btnIpad, btnIphone].forEach(btn => {
+        if (btn) btn.className = "px-3 py-1 rounded-full text-slate-300 hover:text-white transition-all cursor-pointer";
+      });
+
+      if (mode === 'iphone') {
+        if (btnIphone) btnIphone.className = "px-3 py-1 rounded-full bg-white text-slate-950 font-bold shadow-xs transition-all cursor-pointer";
+        frame.className = "device-iphone w-full max-w-[393px] bg-white rounded-[50px] shadow-[0_25px_70px_rgba(0,0,0,0.35)] border-[10px] border-slate-900 overflow-hidden relative transition-all duration-300 my-2";
+        if (statusBar) statusBar.classList.remove('hidden');
+        if (homeBar) homeBar.classList.remove('hidden');
+        if (mobileNav) mobileNav.classList.add('hidden');
+        if (inDeviceNav) {
+          inDeviceNav.classList.remove('hidden');
+          inDeviceNav.classList.add('flex');
+        }
+        showToast("เปลี่ยนเป็นมุมมองจำลอง iPhone (390px)");
+      } else if (mode === 'ipad') {
+        if (btnIpad) btnIpad.className = "px-3 py-1 rounded-full bg-white text-slate-950 font-bold shadow-xs transition-all cursor-pointer";
+        frame.className = "device-ipad w-full max-w-[768px] bg-white rounded-[36px] shadow-[0_25px_70px_rgba(0,0,0,0.25)] border-[12px] border-slate-800 overflow-hidden relative transition-all duration-300 my-2";
+        if (statusBar) statusBar.classList.remove('hidden');
+        if (homeBar) homeBar.classList.remove('hidden');
+        if (mobileNav) mobileNav.classList.add('hidden');
+        if (inDeviceNav) {
+          inDeviceNav.classList.add('hidden');
+          inDeviceNav.classList.remove('flex');
+        }
+        showToast("เปลี่ยนเป็นมุมมองจำลอง iPad (768px)");
+      } else {
+        if (btnDesktop) btnDesktop.className = "px-3 py-1 rounded-full bg-white text-slate-950 font-bold shadow-xs transition-all cursor-pointer";
+        frame.className = "device-desktop w-full max-w-6xl transition-all duration-300";
+        if (statusBar) statusBar.classList.add('hidden');
+        if (homeBar) homeBar.classList.add('hidden');
+        if (mobileNav) mobileNav.classList.add('hidden');
+        if (inDeviceNav) {
+          inDeviceNav.classList.add('hidden');
+          inDeviceNav.classList.remove('flex');
+        }
+        showToast("เปลี่ยนเป็นมุมมองเต็มจอ Desktop");
+      }
+    }
+
+    // Live update preview
+    function updateCardLive() {
+      const pair = document.getElementById('cardPair').value || 'XAUUSD';
+      const status = document.getElementById('cardStatus').value || 'CLOSED';
+      const pnlPct = document.getElementById('cardPnlPercent').value || '+0.00%';
+      const pnlAmt = document.getElementById('cardPnlAmount').value || '$0.00';
+      const entry = document.getElementById('cardEntry').value || '0.00';
+      const exit = document.getElementById('cardExit').value || '0.00';
+
+      document.getElementById('previewPair').innerText = pair;
+      document.getElementById('previewStatus').innerText = status;
+      document.getElementById('previewPnlPercent').innerText = pnlPct;
+      document.getElementById('previewPnlAmount').innerText = pnlAmt;
+      document.getElementById('previewEntry').innerText = entry;
+      document.getElementById('previewExit').innerText = exit;
+
+      const pnlElem = document.getElementById('previewPnlPercent');
+      if (pnlPct.includes('-')) {
+        pnlElem.className = "text-4xl sm:text-5xl font-black font-mono tracking-tight text-rose-600";
+      } else {
+        pnlElem.className = "text-4xl sm:text-5xl font-black font-mono tracking-tight text-emerald-600";
+      }
+    }
+
+    // Orientation toggle
+    function setOrientation(mode) {
+      const card = document.getElementById('pnlCard');
+      const bLand = document.getElementById('btn-ori-land');
+      const bPort = document.getElementById('btn-ori-port');
+
+      if (mode === 'portrait') {
+        card.classList.remove('aspect-[16/10]', 'max-w-[460px]');
+        card.classList.add('aspect-[9/14]', 'max-w-[340px]');
+        bPort.className = "border border-slate-900 bg-slate-900 text-white text-xs py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-2xs";
+        bLand.className = "border border-slate-200 bg-white text-slate-700 text-xs py-2 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-2xs";
+      } else {
+        card.classList.remove('aspect-[9/14]', 'max-w-[340px]');
+        card.classList.add('aspect-[16/10]', 'max-w-[460px]');
+        bLand.className = "border border-slate-900 bg-slate-900 text-white text-xs py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-2xs";
+        bPort.className = "border border-slate-200 bg-white text-slate-700 text-xs py-2 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-2xs";
+      }
+    }
+
+    // Render Card Canvas Frame Engine (Used for both PNG snapshot and Video recording)
+    function renderCardToCanvas(ctx, canvas, isPortrait) {
+      // 1. Base Background
+      const bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(0.35, '#f8fafc');
+      bgGrad.addColorStop(0.7, '#f1f5f9');
+      bgGrad.addColorStop(1, '#ffffff');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Blurred Background Layer (Image or Video frame)
+      let bgMediaToDraw = null;
+      if (bgTheme === 'media' && uploadedMediaObj) {
+        bgMediaToDraw = uploadedMediaObj;
+      } else if (bgTheme === 'custom' && separateBgObj) {
+        bgMediaToDraw = separateBgObj;
+      }
+
+      if (bgMediaToDraw) {
+        ctx.save();
+        if (bgBlurAmount > 0) {
+          ctx.filter = `blur(${bgBlurAmount * 1.8}px)`;
+        }
+        const pad = (bgBlurAmount * 3) + 80;
+        ctx.drawImage(bgMediaToDraw, -pad, -pad, canvas.width + pad * 2, canvas.height + pad * 2);
+        ctx.restore();
+        ctx.filter = 'none';
+
+        // Frosted Glass Tint Overlay
+        ctx.fillStyle = `rgba(255, 255, 255, ${bgTintAmount / 100})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 3. Pearlescent Holo Gradient
+      const holoGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      holoGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+      holoGrad.addColorStop(0.2, 'rgba(254, 240, 138, 0.25)');
+      holoGrad.addColorStop(0.4, 'rgba(244, 114, 182, 0.2)');
+      holoGrad.addColorStop(0.6, 'rgba(103, 232, 249, 0.25)');
+      holoGrad.addColorStop(0.8, 'rgba(192, 132, 252, 0.2)');
+      holoGrad.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
+      ctx.fillStyle = holoGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 4. Border
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+      // Data retrieval
+      const pair = document.getElementById('previewPair').innerText;
+      const status = document.getElementById('previewStatus').innerText;
+      const pnlPct = document.getElementById('previewPnlPercent').innerText;
+      const pnlAmt = document.getElementById('previewPnlAmount').innerText;
+      const entry = document.getElementById('previewEntry').innerText;
+      const exit = document.getElementById('previewExit').innerText;
+
+      if (!isPortrait) {
+        // LANDSCAPE LAYOUT (1200 x 750)
+        ctx.font = 'bold 44px sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'left';
+        ctx.fillText(pair, 80, 120);
+
+        ctx.font = '22px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(status, 80, 160);
+
+        ctx.font = 'bold 36px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'right';
+        ctx.fillText('TradingJOURNAL', canvas.width - 80, 120);
+        ctx.font = '20px sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('JOURNAL TRADE', canvas.width - 80, 155);
+
+        ctx.textAlign = 'left';
+        ctx.font = '900 110px monospace';
+        ctx.fillStyle = pnlPct.includes('-') ? '#e11d48' : '#059669';
+        ctx.fillText(pnlPct, 80, 360);
+
+        ctx.font = 'bold 36px monospace';
+        ctx.fillStyle = '#334155';
+        ctx.fillText(pnlAmt, 85, 420);
+
+        // Foreground Sharp Media Box
+        const imgW = 250;
+        const imgH = 250;
+        const imgX = canvas.width - 340;
+        const imgY = 220;
+
+        if (uploadedMediaObj) {
+          ctx.save();
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(imgX, imgY, imgW, imgH, 28);
+          else ctx.arc(imgX + imgW/2, imgY + imgH/2, imgW/2, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(uploadedMediaObj, imgX, imgY, imgW, imgH);
+          ctx.restore();
+
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(imgX, imgY, imgW, imgH, 28);
+          else ctx.arc(imgX + imgW/2, imgY + imgH/2, imgW/2, 0, Math.PI * 2);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = '#f8fafc';
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(imgX, imgY, imgW, imgH, 28);
+          else ctx.arc(imgX + imgW/2, imgY + imgH/2, imgW/2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.font = 'bold 36px monospace';
+          ctx.fillStyle = '#94a3b8';
+          ctx.textAlign = 'center';
+          ctx.fillText('MEDIA', imgX + imgW/2, imgY + 125);
+        }
+
+        // Bottom Bar
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(80, 520);
+        ctx.lineTo(canvas.width - 80, 520);
+        ctx.stroke();
+
+        ctx.font = '20px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.textAlign = 'left';
+        ctx.fillText('ENTRY PRICE', 80, 570);
+        ctx.font = 'bold 32px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(entry, 80, 615);
+
+        ctx.font = '20px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('EXIT PRICE', 380, 570);
+        ctx.font = 'bold 32px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(exit, 380, 615);
+
+        ctx.textAlign = 'right';
+        ctx.font = '22px sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('Track your edge with TradingJOURNAL', canvas.width - 80, 605);
+      } else {
+        // PORTRAIT LAYOUT (1080 x 1680) - Ideal for TikTok / IG Reels
+        ctx.font = 'bold 54px sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'left';
+        ctx.fillText(pair, 90, 150);
+
+        ctx.font = '26px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(status, 90, 200);
+
+        ctx.font = 'bold 42px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'right';
+        ctx.fillText('TradingJOURNAL', canvas.width - 90, 150);
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('JOURNAL TRADE', canvas.width - 90, 195);
+
+        // Center Media Box
+        const imgSize = 520;
+        const imgX = (canvas.width - imgSize) / 2;
+        const imgY = 320;
+
+        if (uploadedMediaObj) {
+          ctx.save();
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(imgX, imgY, imgSize, imgSize, 40);
+          else ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(uploadedMediaObj, imgX, imgY, imgSize, imgSize);
+          ctx.restore();
+
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(imgX, imgY, imgSize, imgSize, 40);
+          else ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // PnL in Portrait
+        ctx.textAlign = 'center';
+        ctx.font = '900 140px monospace';
+        ctx.fillStyle = pnlPct.includes('-') ? '#e11d48' : '#059669';
+        ctx.fillText(pnlPct, canvas.width / 2, 1020);
+
+        ctx.font = 'bold 50px monospace';
+        ctx.fillStyle = '#334155';
+        ctx.fillText(pnlAmt, canvas.width / 2, 1100);
+
+        // Bottom Prices in Portrait
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(90, 1260);
+        ctx.lineTo(canvas.width - 90, 1260);
+        ctx.stroke();
+
+        ctx.textAlign = 'left';
+        ctx.font = '26px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('ENTRY PRICE', 120, 1340);
+        ctx.font = 'bold 44px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(entry, 120, 1400);
+
+        ctx.font = '26px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('EXIT PRICE', 640, 1340);
+        ctx.font = 'bold 44px monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(exit, 640, 1400);
+
+        ctx.textAlign = 'center';
+        ctx.font = '28px sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('Track your edge with TradingJOURNAL', canvas.width / 2, 1550);
+      }
+    }
+
+    // Export Card as PNG Snapshot
+    function downloadCardImage() {
+      const isPortrait = document.getElementById('pnlCard').classList.contains('aspect-[9/14]');
+      const canvas = document.createElement('canvas');
+      canvas.width = isPortrait ? 1080 : 1200;
+      canvas.height = isPortrait ? 1680 : 750;
+      const ctx = canvas.getContext('2d');
+
+      renderCardToCanvas(ctx, canvas, isPortrait);
+
+      canvas.toBlob(function(blob) {
+        if (!blob) return;
+        const pair = document.getElementById('previewPair').innerText.replace(/[^a-zA-Z0-9]/g, '_');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `tradingjournal-card-${pair}-${Date.now()}.png`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }, 1500);
+
+        showToast("บันทึกภาพนิ่ง PNG เรียบร้อย! ตรวจสอบในโฟลเดอร์ Downloads ได้เลย");
+      }, 'image/png');
+    }
+
+    // Record Card as Live Looping Video Clip (for TikTok / Reels / Shorts)
+    let isRecordingVideo = false;
+    let videoMediaRecorder = null;
+
+    function recordCardVideo() {
+      if (isRecordingVideo) return;
+
+      const isPortrait = document.getElementById('pnlCard').classList.contains('aspect-[9/14]');
+      const canvas = document.createElement('canvas');
+      canvas.width = isPortrait ? 1080 : 1200;
+      canvas.height = isPortrait ? 1680 : 750;
+      const ctx = canvas.getContext('2d');
+
+      if (!canvas.captureStream) {
+        showToast("เบราว์เซอร์นี้ไม่รองรับการบันทึกวิดีโอโดยตรง กรุณาใช้ปุ่มบันทึกภาพนิ่ง");
+        return;
+      }
+
+      const stream = canvas.captureStream(30);
+
+      // Best supported MIME type
+      let mimeType = 'video/webm';
+      let ext = 'webm';
+      if (window.MediaRecorder) {
+        if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+          mimeType = 'video/mp4;codecs=avc1';
+          ext = 'mp4';
+        } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+          mimeType = 'video/mp4';
+          ext = 'mp4';
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+          mimeType = 'video/webm;codecs=vp9';
+          ext = 'webm';
+        } else if (MediaRecorder.isTypeSupported('video/webm')) {
+          mimeType = 'video/webm';
+          ext = 'webm';
+        }
+      }
+
+      let recordedChunks = [];
+      try {
+        videoMediaRecorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 6000000 });
+      } catch (err) {
+        try {
+          videoMediaRecorder = new MediaRecorder(stream);
+        } catch (e) {
+          showToast("ไม่สามารถเริ่มบันทึกวิดีโอได้");
+          return;
+        }
+      }
+
+      isRecordingVideo = true;
+      const btn = document.getElementById('btnRecordVideo');
+      const indicator = document.getElementById('recordVideoIndicator');
+      const text = document.getElementById('recordVideoText');
+      const help = document.getElementById('exportHelpText');
+
+      // Update button state to Recording
+      btn.className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer animate-pulse";
+      if (indicator) indicator.classList.remove('hidden');
+
+      const totalSeconds = 4;
+      let remainingSec = totalSeconds;
+      if (text) text.innerText = `กำลังบันทึกวิดีโอการ์ด (${remainingSec}s)...`;
+      if (help) help.innerText = `กำลังบันทึกแอนิเมชันและการเคลื่อนไหวของการ์ดเป็นวิดีโอความคมชัดสูง... (${remainingSec}s)`;
+
+      const countdownTimer = setInterval(() => {
+        remainingSec--;
+        if (remainingSec > 0) {
+          if (text) text.innerText = `กำลังบันทึกวิดีโอการ์ด (${remainingSec}s)...`;
+          if (help) help.innerText = `กำลังบันทึกแอนิเมชันและการเคลื่อนไหวของการ์ดเป็นวิดีโอความคมชัดสูง... (${remainingSec}s)`;
+        }
+      }, 1000);
+
+      videoMediaRecorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      videoMediaRecorder.onstop = function() {
+        clearInterval(countdownTimer);
+        isRecordingVideo = false;
+
+        btn.className = "w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98";
+        if (indicator) indicator.classList.add('hidden');
+        if (text) text.innerText = "บันทึกเป็นคลิปวิดีโอ (Record Video MP4)";
+        if (help) help.innerText = "สำหรับวิดีโอ: กดปุ่มสีเขียวเพื่อบันทึกคลิปการ์ดเคลื่อนไหว 4 วินาที นำไปลง TikTok / IG Reels / Story ได้ทันที";
+
+        if (recordedChunks.length === 0) return;
+
+        const blob = new Blob(recordedChunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const pair = document.getElementById('previewPair').innerText.replace(/[^a-zA-Z0-9]/g, '_');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tradingjournal-video-${pair}-${Date.now()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 1000);
+
+        showToast("บันทึกคลิปวิดีโอการ์ดสำเร็จ! พร้อมนำไปโพสต์ TikTok/Reels ได้เลย");
+      };
+
+      let isRunning = true;
+      function recordFrameLoop() {
+        if (!isRunning) return;
+        renderCardToCanvas(ctx, canvas, isPortrait);
+        requestAnimationFrame(recordFrameLoop);
+      }
+
+      videoMediaRecorder.start(200);
+      requestAnimationFrame(recordFrameLoop);
+
+      setTimeout(() => {
+        isRunning = false;
+        if (videoMediaRecorder && videoMediaRecorder.state !== 'inactive') {
+          videoMediaRecorder.stop();
+        }
+      }, totalSeconds * 1000);
+    }
+
+    // Close modals on Escape key or backdrop click
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDayDetailModal();
+        closeAddTradeModal();
+      }
+    });
+
+    document.getElementById('modalDayDetail')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalDayDetail') closeDayDetailModal();
+    });
+
+    document.getElementById('modalAddTrade')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalAddTrade') closeAddTradeModal();
+    });
+
+    // Initialize calendar on page load
+    renderCalendar();
+    populateQuickFillDropdown(2025, 11, 31);
+  </script>
+</body>
+</html>
