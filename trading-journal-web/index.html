@@ -18,6 +18,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client for Realtime Cross-Device Sync -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -269,7 +271,11 @@
       </div>
 
       <!-- Actions & Tab Switcher (Fits cleanly on iPad) -->
-      <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+      <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end flex-wrap sm:flex-nowrap">
+        <button onclick="openCloudSyncModal()" id="btnHeaderCloudSync" class="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+          <span id="headerCloudDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span id="headerCloudText">คลาวด์ซิงค์</span>
+        </button>
         <div class="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 w-full sm:w-auto">
           <button onclick="switchTab('calendar')" id="tab-calendar" class="flex-1 sm:flex-none text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
             ปฏิทิน
@@ -944,6 +950,8 @@
           <span class="text-[10px] text-slate-400 mr-1">เลือกด่วน:</span>
           <button type="button" onclick="setTradePair('XAUUSD')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">XAUUSD</button>
           <button type="button" onclick="setTradePair('NQ')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">NQ</button>
+          <button type="button" onclick="setTradePair('BTCUSD')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">BTC</button>
+          <button type="button" onclick="setTradePair('EURUSD')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md font-mono font-semibold transition-colors">EURUSD</button>
         </div>
 
         <!-- Row 2: Direction (BUY / SELL) & Outcome -->
@@ -981,12 +989,12 @@
             <label class="block text-xs font-semibold text-slate-700 mb-1">จำนวนเงิน กำไร/ขาดทุน ($ PnL)</label>
             <div class="relative">
               <span id="pnlSignPrefix" class="absolute left-3 top-2 text-xs font-mono font-bold text-emerald-600">+$</span>
-              <input type="number" step="0.01" id="tradePnlAmount" required placeholder="150.00" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-slate-400">
+              <input type="number" step="0.01" id="tradePnlAmount" required placeholder="0.00" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:border-slate-400">
             </div>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">ขนาด Lot / Volume</label>
-            <input type="number" step="0.01" id="tradeLot" placeholder="0.50" value="0.50" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
+            <input type="number" step="0.01" id="tradeLot" placeholder="0.50" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400">
           </div>
         </div>
 
@@ -994,11 +1002,11 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-slate-600 mb-1">ราคาเข้า (Entry Price)</label>
-            <input type="text" id="tradeEntryPrice" placeholder="2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+            <input type="text" id="tradeEntryPrice" placeholder="เช่น 2,680.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-600 mb-1">ราคาออก (Exit Price)</label>
-            <input type="text" id="tradeExitPrice" placeholder="2,710.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+            <input type="text" id="tradeExitPrice" placeholder="เช่น 2,710.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
           </div>
         </div>
 
@@ -1021,12 +1029,12 @@
           <textarea id="tradeNotes" rows="2" placeholder="จดบันทึกเหตุผลการเข้า สภาพจิตใจ หรือสิ่งที่ทำได้ดีในไม้นี้..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"></textarea>
         </div>
 
-        <!-- Modal Footer Actions -->
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeAddTradeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+        <!-- Modal Footer Actions (Optimized for iPhone Safari bottom bar) -->
+        <div class="pt-3 pb-8 sm:pb-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeAddTradeModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
             ยกเลิก
           </button>
-          <button type="submit" id="addTradeSubmitBtn" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
+          <button type="submit" id="addTradeSubmitBtn" class="px-6 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
             <span>✓</span>
             <span id="addTradeSubmitLabel">บันทึกไม้เทรด</span>
           </button>
@@ -1035,6 +1043,85 @@
       </form>
 
     </div>
+  </div>
+
+  <!-- MODAL: CLOUD SYNC (เชื่อมต่อระบบคลาวด์ซิงค์ข้ามเครื่อง) -->
+  <div id="modalCloudSync" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-slate-200/90 shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+      
+      <div class="sm:hidden w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2.5 shrink-0"></div>
+
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-xs">
+            ☁️
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">เชื่อมต่อคลาวด์ซิงค์ (Supabase Cloud)</h3>
+            <p class="text-[11px] text-slate-400">ซิงค์ข้อมูลระหว่าง มือถือ • ไอแพด • คอมพิวเตอร์</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCloudSyncModal()" class="w-7 h-7 rounded-lg hover:bg-slate-200/60 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer text-sm font-bold">
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- Status Banner -->
+        <div id="cloudStatusBanner" class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="cloudModalStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+            <div>
+              <div class="text-xs font-bold text-slate-800" id="cloudModalStatusTitle">ยังไม่ได้เชื่อมต่อคลาวด์</div>
+              <div class="text-[11px] text-slate-400" id="cloudModalStatusSub">บันทึกข้อมูลเฉพาะในเครื่องนี้เท่านั้น</div>
+            </div>
+          </div>
+          <button id="btnCloudDisconnect" onclick="handleCloudDisconnect()" class="hidden text-xs text-rose-600 hover:text-rose-700 font-semibold px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 transition-all cursor-pointer">
+            ตัดการเชื่อมต่อ
+          </button>
+        </div>
+
+        <!-- Sync Key Form -->
+        <form id="cloudSyncForm" onsubmit="handleConnectCloud(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              รหัสซิงค์พอร์ต (Sync ID / Email)
+            </label>
+            <input type="text" id="inputSyncId" required placeholder="เช่น cheesepie17 หรือ mytrading" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-slate-400 focus:bg-white transition-all">
+            <p class="text-[11px] text-slate-400 mt-1">
+              💡 นำรหัสเดียวกันนี้ไปกรอกใน โทรศัพท์, ไอแพด และคอมพิวเตอร์ ข้อมูลจะซิงค์หากันอัตโนมัติ 100%
+            </p>
+          </div>
+
+          <div class="pt-2 flex items-center justify-end gap-2">
+            <button type="button" onclick="closeCloudSyncModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+              ปิด
+            </button>
+            <button type="submit" id="btnSubmitCloudSync" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <span>เชื่อมต่อและดึงข้อมูล</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Help for Database Table Setup -->
+        <div class="bg-amber-50/70 border border-amber-200/70 rounded-xl p-3 text-[11px] text-amber-900 space-y-1.5">
+          <div class="font-bold flex items-center gap-1.5 text-amber-900">
+            <span>⚙️ การตั้งค่าครั้งแรกบน Supabase</span>
+          </div>
+          <p class="leading-relaxed text-amber-800">
+            ไปที่ Supabase > <strong>SQL Editor</strong> > วางคำสั่งด้านล่างนี้แล้วกด <strong>Run</strong> (ทำครั้งเดียวเพื่อเปิดตารางฐานข้อมูล):
+          </p>
+          <pre class="bg-white/90 p-2 rounded-lg text-[10px] font-mono text-slate-800 overflow-x-auto border border-amber-200/50 select-all">create table if not exists user_journal (
+  id text primary key,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz default now()
+);
+alter table user_journal enable row level security;
+create policy "Allow all access" on user_journal for all using (true) with check (true);</pre>
+        </div>
+
+      </div>
+
   </div>
 
   <!-- Global Floating Toast Notification -->
@@ -1067,7 +1154,7 @@
     ];
 
     // Clean data cache - starts empty for real user trading records
-    const monthDataCache = {};
+    let monthDataCache = {};
 
     function createEmptyMonthData() {
       return {
@@ -1112,6 +1199,9 @@
         localStorage.removeItem('tradingjournal_custom_data');
         for (const k in monthDataCache) delete monthDataCache[k];
         renderCalendar();
+        if (typeof syncFullDataToCloud === 'function') {
+          syncFullDataToCloud({});
+        }
         showToast('ล้างข้อมูลปฏิทินเรียบร้อยแล้ว (ตารางว่างพร้อมบันทึก)');
       }
     }
@@ -1323,13 +1413,8 @@
       }
     }
 
-    let selectedDateInfo = {
-      year: 2025,
-      month: 11,
-      day: 31,
-      dateStr: 'Dec 31, 2025'
-    };
-    let currentDayDetailDate = { y: 2025, m: 11, d: 31 };
+    let selectedDateInfo = null;
+    let currentDayDetailDate = null;
 
     // Pick Day from Calendar into PnL Card Studio & Selection State
     function pickDayForCard(date, pnlAmt, tradesCount, pair, action, entry, exit, pnlPct, y = 2025, m = 11, d = 31) {
@@ -1906,6 +1991,9 @@
         const stored = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
         stored[`${y}-${m}`] = monthData;
         localStorage.setItem('tradingjournal_custom_data', JSON.stringify(stored));
+        
+        // Auto-sync to Supabase cloud if connected
+        syncFullDataToCloud(stored);
       } catch (err) {
         console.warn('Storage error', err);
       }
@@ -1924,8 +2012,9 @@
 
       if (prefillDate) {
         dateInput.value = prefillDate;
-      } else if (selectedDateInfo) {
-        const y = selectedDateInfo.year;
+      } else if (selectedDateInfo && selectedDateInfo.year && selectedDateInfo.month !== undefined && selectedDateInfo.day) {
+        let y = selectedDateInfo.year;
+        if (y > 2400) y -= 543;
         const m = String(selectedDateInfo.month + 1).padStart(2, '0');
         const d = String(selectedDateInfo.day).padStart(2, '0');
         dateInput.value = `${y}-${m}-${d}`;
@@ -1936,6 +2025,16 @@
         const d = String(today.getDate()).padStart(2, '0');
         dateInput.value = `${y}-${m}-${d}`;
       }
+
+      // Reset form fields to clean state
+      document.getElementById('tradePnlAmount').value = '';
+      document.getElementById('tradeLot').value = '';
+      document.getElementById('tradeEntryPrice').value = '';
+      document.getElementById('tradeExitPrice').value = '';
+      document.getElementById('tradeSetup').value = '';
+      document.getElementById('tradeNotes').value = '';
+      setTradeDirection('BUY');
+      setTradeResult('WIN');
 
       modal.classList.remove('hidden');
     }
@@ -2020,7 +2119,10 @@
       if (!dateStr) return;
 
       const [yStr, mStr, dStr] = dateStr.split('-');
-      const targetYear = parseInt(yStr, 10);
+      let targetYear = parseInt(yStr, 10);
+      if (targetYear > 2400) {
+        targetYear -= 543; // Fix Thai Buddhist Era (e.g. 2569 -> 2026)
+      }
       const targetMonth = parseInt(mStr, 10) - 1; // 0-indexed month
       const targetDay = parseInt(dStr, 10);
 
@@ -2030,8 +2132,8 @@
       const rawAmt = parseFloat(document.getElementById('tradePnlAmount').value) || 0;
       const signedPnl = result === 'LOSS' ? -Math.abs(rawAmt) : Math.abs(rawAmt);
       const lot = parseFloat(document.getElementById('tradeLot').value) || 0.50;
-      const entry = document.getElementById('tradeEntryPrice').value.trim() || '2,680.00';
-      const exit = document.getElementById('tradeExitPrice').value.trim() || '2,710.00';
+      const entry = document.getElementById('tradeEntryPrice').value.trim() || '-';
+      const exit = document.getElementById('tradeExitPrice').value.trim() || '-';
       const setup = document.getElementById('tradeSetup').value.trim();
       const notes = document.getElementById('tradeNotes').value.trim();
 
@@ -2837,6 +2939,7 @@
       if (e.key === 'Escape') {
         closeDayDetailModal();
         closeAddTradeModal();
+        closeCloudSyncModal();
       }
     });
 
@@ -2848,10 +2951,193 @@
       if (e.target.id === 'modalAddTrade') closeAddTradeModal();
     });
 
+    document.getElementById('modalCloudSync')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalCloudSync') closeCloudSyncModal();
+    });
+
+    // ==========================================
+    // SUPABASE REALTIME CLOUD SYNC
+    // ==========================================
+    const SUPABASE_PROJECT_URL = 'https://kjorreekhwbbtymcsyaw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqb3JyZWVraHdiYnR5bWNzeWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMzg3MTQsImV4cCI6MjEwNzkxNDcxNH0.0kWoklSICixQ2AF2aywobgx2X_XWZ6ncHZSG9uly9r8';
+
+    let supabaseClient = null;
+    let cloudSyncId = localStorage.getItem('tradingjournal_cloud_id') || '';
+    let cloudSyncChannel = null;
+
+    function initSupabase() {
+      try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+          updateCloudUIStatus();
+          if (cloudSyncId) {
+            pullFromCloudAndSubscribe(cloudSyncId);
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase init error:', err);
+      }
+    }
+
+    function updateCloudUIStatus() {
+      const dot = document.getElementById('headerCloudDot');
+      const text = document.getElementById('headerCloudText');
+      const modalDot = document.getElementById('cloudModalStatusDot');
+      const modalTitle = document.getElementById('cloudModalStatusTitle');
+      const modalSub = document.getElementById('cloudModalStatusSub');
+      const btnDisconnect = document.getElementById('btnCloudDisconnect');
+      const inputSync = document.getElementById('inputSyncId');
+
+      if (cloudSyncId) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+        if (text) text.innerText = `คลาวด์: ${cloudSyncId}`;
+        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+        if (modalTitle) modalTitle.innerText = `เชื่อมต่อคลาวด์แล้ว (${cloudSyncId})`;
+        if (modalSub) modalSub.innerText = 'ข้อมูลซิงค์ตรงกันทุกอุปกรณ์แบบ Realtime';
+        if (btnDisconnect) btnDisconnect.classList.remove('hidden');
+        if (inputSync) inputSync.value = cloudSyncId;
+      } else {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-slate-400';
+        if (text) text.innerText = 'คลาวด์ซิงค์';
+        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
+        if (modalTitle) modalTitle.innerText = 'ยังไม่ได้เชื่อมต่อคลาวด์';
+        if (modalSub) modalSub.innerText = 'บันทึกข้อมูลเฉพาะในเครื่องนี้เท่านั้น';
+        if (btnDisconnect) btnDisconnect.classList.add('hidden');
+      }
+    }
+
+    function openCloudSyncModal() {
+      updateCloudUIStatus();
+      document.getElementById('modalCloudSync').classList.remove('hidden');
+    }
+
+    function closeCloudSyncModal() {
+      document.getElementById('modalCloudSync').classList.add('hidden');
+    }
+
+    async function handleConnectCloud(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('inputSyncId');
+      const id = input.value.trim().toLowerCase();
+      if (!id) return;
+
+      const submitBtn = document.getElementById('btnSubmitCloudSync');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'กำลังเชื่อมต่อ...';
+
+      cloudSyncId = id;
+      localStorage.setItem('tradingjournal_cloud_id', id);
+
+      await pullFromCloudAndSubscribe(id);
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>เชื่อมต่อและดึงข้อมูล</span>';
+      updateCloudUIStatus();
+      closeCloudSyncModal();
+      showToast(`เชื่อมต่อคลาวด์สำเร็จ! (รหัส: ${id})`);
+    }
+
+    function handleCloudDisconnect() {
+      if (confirm('ต้องการยกเลิกการเชื่อมต่อคลาวด์ในเครื่องนี้หรือไม่? (ข้อมูลในเครื่องจะไม่หาย)')) {
+        cloudSyncId = '';
+        localStorage.removeItem('tradingjournal_cloud_id');
+        if (cloudSyncChannel && supabaseClient) {
+          supabaseClient.removeChannel(cloudSyncChannel);
+          cloudSyncChannel = null;
+        }
+        updateCloudUIStatus();
+        showToast('ยกเลิกการเชื่อมต่อคลาวด์แล้ว');
+      }
+    }
+
+    async function pullFromCloudAndSubscribe(id) {
+      if (!supabaseClient || !id) return;
+
+      try {
+        // 1. Fetch remote data
+        const { data, error } = await supabaseClient
+          .from('user_journal')
+          .select('data, updated_at')
+          .eq('id', id)
+          .single();
+
+        if (error && (error.code === 'PGRST116' || (error.message && error.message.includes('No rows')))) {
+          // No record yet, upload current local data
+          const localData = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
+          await supabaseClient.from('user_journal').upsert({
+            id: id,
+            data: localData,
+            updated_at: new Date().toISOString()
+          });
+        } else if (data && data.data) {
+          // Merge remote data with local cache
+          const localData = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
+          const merged = Object.assign({}, localData, data.data);
+          
+          localStorage.setItem('tradingjournal_custom_data', JSON.stringify(merged));
+          monthDataCache = merged;
+          renderCalendar();
+          showToast(`ซิงค์ข้อมูลคลาวด์สำเร็จ! (${id})`);
+        }
+
+        // 2. Setup Realtime subscription
+        if (cloudSyncChannel) {
+          supabaseClient.removeChannel(cloudSyncChannel);
+        }
+
+        cloudSyncChannel = supabaseClient.channel(`journal_channel_${id}`)
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'user_journal',
+            filter: `id=eq.${id}`
+          }, payload => {
+            if (payload.new && payload.new.data) {
+              const remote = payload.new.data;
+              localStorage.setItem('tradingjournal_custom_data', JSON.stringify(remote));
+              monthDataCache = remote;
+              renderCalendar();
+              showToast('ซิงค์ข้อมูลล่าสุดจากคลาวด์แล้ว!', true);
+            }
+          })
+          .subscribe();
+
+      } catch (err) {
+        console.warn('Pull cloud error:', err);
+      }
+    }
+
+    async function syncFullDataToCloud(fullData) {
+      if (!supabaseClient || !cloudSyncId) return;
+      try {
+        await supabaseClient.from('user_journal').upsert({
+          id: cloudSyncId,
+          data: fullData || JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}'),
+          updated_at: new Date().toISOString()
+        });
+      } catch (err) {
+        console.warn('Sync to cloud error:', err);
+      }
+    }
+
+    // Auto-refresh when tab gains focus (e.g. switching back on iPad / iPhone)
+    window.addEventListener('focus', () => {
+      if (cloudSyncId && supabaseClient) {
+        pullFromCloudAndSubscribe(cloudSyncId);
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && cloudSyncId && supabaseClient) {
+        pullFromCloudAndSubscribe(cloudSyncId);
+      }
+    });
+
     // Initialize calendar on page load
     renderCalendar();
     populateQuickFillDropdown(viewYear, viewMonth, new Date().getDate());
     updateCardLive();
+    initSupabase();
   </script>
 </body>
 </html>
