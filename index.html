@@ -1154,7 +1154,7 @@ create policy "Allow all access" on user_journal for all using (true) with check
     ];
 
     // Clean data cache - starts empty for real user trading records
-    const monthDataCache = {};
+    let monthDataCache = {};
 
     function createEmptyMonthData() {
       return {
@@ -3074,9 +3074,10 @@ create policy "Allow all access" on user_journal for all using (true) with check
           const localData = JSON.parse(localStorage.getItem('tradingjournal_custom_data') || '{}');
           const merged = Object.assign({}, localData, data.data);
           
-          monthDataCache = merged;
           localStorage.setItem('tradingjournal_custom_data', JSON.stringify(merged));
+          monthDataCache = merged;
           renderCalendar();
+          showToast(`ซิงค์ข้อมูลคลาวด์สำเร็จ! (${id})`);
         }
 
         // 2. Setup Realtime subscription
@@ -3092,8 +3093,9 @@ create policy "Allow all access" on user_journal for all using (true) with check
             filter: `id=eq.${id}`
           }, payload => {
             if (payload.new && payload.new.data) {
-              monthDataCache = payload.new.data;
-              localStorage.setItem('tradingjournal_custom_data', JSON.stringify(monthDataCache));
+              const remote = payload.new.data;
+              localStorage.setItem('tradingjournal_custom_data', JSON.stringify(remote));
+              monthDataCache = remote;
               renderCalendar();
               showToast('ซิงค์ข้อมูลล่าสุดจากคลาวด์แล้ว!', true);
             }
